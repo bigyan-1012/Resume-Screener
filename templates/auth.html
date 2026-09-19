@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Access | Hire𝒽ive</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="auth-page">
+    <div class="bg-gradient-background"></div>
+    <div class="grid-overlay"></div>
+    <div class="glow-blob blob-1"></div>
+    <div class="glow-blob blob-2"></div>
+    <div class="glow-blob blob-3"></div>
+
+    <div class="auth-container">
+        <!-- Brand Logo Header -->
+        <header class="app-header" style="border:none; background:none;">
+            <a href="{{ url_for('landing') }}" class="logo-link">
+                <div class="logo-container" style="margin-bottom: 0;">
+                    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Hire𝒽ive Logo" class="brand-logo-img" style="height: 38px; border-radius: 8px;">
+                    <h1 class="logo-text">Hire<span class="logo-accent">𝒽</span>ive</h1>
+                </div>
+            </a>
+            <p class="header-subtitle" style="margin-top: 1rem;">Secure access to the automated resume intelligence suite.</p>
+        </header>
+
+        <!-- Auth Card -->
+        <div class="auth-card-wrapper">
+            <div class="auth-card-glow"></div>
+            <div class="auth-card">
+                
+                <!-- Tab Headers -->
+                <div class="auth-tabs">
+                    <a href="{{ url_for('login') }}" class="auth-tab-btn {% if action == 'login' %}active{% endif %}" id="tab-login-btn">
+                        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+                    </a>
+                    <a href="{{ url_for('signup') }}" class="auth-tab-btn {% if action == 'signup' %}active{% endif %}" id="tab-signup-btn">
+                        <i class="fa-solid fa-user-plus"></i> Create Account
+                    </a>
+                </div>
+
+                <!-- Error Alert -->
+                {% if error %}
+                <div class="auth-error-alert animate-fade-in">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>{{ error }}</span>
+                </div>
+                {% endif %}
+
+                <!-- Login Form -->
+                {% if action == 'login' %}
+                <form action="{{ url_for('login') }}" method="POST" class="auth-form" id="login-form">
+                    <div class="form-group">
+                        <label for="login-username">
+                            <i class="fa-solid fa-user"></i> Username
+                        </label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="login-username" 
+                                name="username" 
+                                placeholder="Enter your username" 
+                                required 
+                                autocomplete="username"
+                                autofocus
+                            >
+                            <span class="input-focus-border"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="login-password">
+                            <i class="fa-solid fa-lock"></i> Password
+                        </label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="password" 
+                                id="login-password" 
+                                name="password" 
+                                placeholder="Enter your password" 
+                                required
+                                autocomplete="current-password"
+                            >
+                            <span class="input-focus-border"></span>
+                            <i class="fa-solid fa-eye-slash password-toggle-icon"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-button auth-submit">
+                        <span><i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In</span>
+                    </button>
+                </form>
+                {% endif %}
+
+                <!-- Signup Form -->
+                {% if action == 'signup' %}
+                <form action="{{ url_for('signup') }}" method="POST" class="auth-form" id="signup-form">
+                    <div class="form-group">
+                        <label for="signup-username">
+                            <i class="fa-solid fa-user"></i> Choose Username
+                        </label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="signup-username" 
+                                name="username" 
+                                placeholder="Min 3 characters" 
+                                required
+                                autocomplete="username"
+                                autofocus
+                            >
+                            <span class="input-focus-border"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signup-password">
+                            <i class="fa-solid fa-lock"></i> Create Password
+                        </label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="password" 
+                                id="signup-password" 
+                                name="password" 
+                                placeholder="Min 6 characters (encrypted)" 
+                                required
+                                autocomplete="new-password"
+                            >
+                            <span class="input-focus-border"></span>
+                            <i class="fa-solid fa-eye-slash password-toggle-icon"></i>
+                        </div>
+                    </div>
+
+                    <!-- Password strength helper -->
+                    <div class="password-strength-meter" id="strength-meter" style="display: none;">
+                        <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+                        <span class="strength-text" id="strength-text">Weak Password</span>
+                    </div>
+
+                    <button type="submit" class="submit-button auth-submit">
+                        <span><i class="fa-solid fa-user-check"></i> Register Account</span>
+                    </button>
+
+                </form>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth page JavaScript -->
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hire𝒽ive | AI-Powered Resume Screening & Skill Matching Platform</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="landing-page">
+    <!-- Splash Screen Intro -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-logo-container">
+            <div class="logo-container splash-logo-row">
+                <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Hire𝒽ive Logo"
+                    class="brand-logo-img splash-icon">
+                <h1 class="logo-text splash-logo-text">
+                    Hire<span class="logo-accent">𝒽</span>ive
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Background Assets -->
+    <div class="bg-gradient-background"></div>
+    <div class="bg-dim-overlay" id="bg-dim-overlay"></div>
+    <div class="grid-overlay"></div>
+    <div class="glow-blob blob-1"></div>
+    <div class="glow-blob blob-2"></div>
+    <div class="glow-blob blob-3"></div>
+
+    <!-- Concentric Waves for Workspace -->
+    <div class="concentric-waves-container" style="z-index: -1;">
+        <div class="wave wave-1"></div>
+        <div class="wave wave-2"></div>
+        <div class="wave wave-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Floating Glass Navbar -->
+        <header class="app-header landing-navbar" id="app-navbar">
+            <div class="header-top-bar">
+                <a href="#" onclick="navigateToTab('home'); return false;" class="logo-link">
+                    <div class="logo-container" style="margin-bottom: 0;">
+                        <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Hire𝒽ive Logo"
+                            class="brand-logo-img" style="height: 38px; border-radius: 8px;">
+                        <h1 class="logo-text">Hire<span class="logo-accent">𝒽</span>ive</h1>
+                    </div>
+                </a>
+
+                <button class="nav-hamburger-btn" id="nav-hamburger-btn" aria-label="Toggle navigation">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div class="nav-links-wrapper" id="nav-links-wrapper">
+                    <a href="#" onclick="navigateToTab('home'); return false;" class="nav-link active"
+                        id="nav-link-home">Home</a>
+                    <a href="#" onclick="navigateToTab('dashboard'); return false;" class="nav-link"
+                        id="nav-link-dashboard">Analyser</a>
+                    <a href="#" onclick="navigateToTab('how-it-works'); return false;" class="nav-link"
+                        id="nav-link-how-it-works">How It Works</a>
+                    <a href="#" onclick="navigateToTab('about'); return false;" class="nav-link"
+                        id="nav-link-about">About</a>
+                    <a href="#" onclick="navigateToTab('news'); return false;" class="nav-link"
+                        id="nav-link-news">News</a>
+                    <a href="#" onclick="navigateToTab('contact'); return false;" class="nav-link"
+                        id="nav-link-contact">Contact Us</a>
+                </div>
+
+                <div class="navbar-actions" id="navbar-actions">
+                    {% if logged_in %}
+                    <div class="profile-dropdown-container">
+                        <button type="button" class="user-profile-bar" id="profile-dropdown-btn">
+                            <i class="fa-solid fa-circle-user user-avatar"></i>
+                            <span class="username-display">Hi, {{ username }}</span>
+                            <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                        </button>
+                        <div class="profile-dropdown-menu" id="profile-dropdown-menu">
+                            <div class="dropdown-header">
+                                <i class="fa-solid fa-circle-user"></i>
+                                <span>Hi, {{ username }}</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" onclick="navigateToTab('dashboard'); return false;" class="dropdown-item">
+                                <i class="fa-solid fa-chart-line"></i> Dashboard
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="{{ url_for('logout') }}" class="dropdown-item logout-link">
+                                <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="submit-button navbar-login-btn">
+                        <span><i class="fa-solid fa-right-to-bracket"></i> Sign In / Sign Up</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <!-- ============================================== -->
+        <!-- 1. HOME VIEW                                   -->
+        <!-- ============================================== -->
+        <div id="view-home" class="page-view active">
+            <main class="landing-hero">
+                <div class="hero-content">
+                    <div class="hero-badge reveal-on-scroll" style="--reveal-delay: 0.1s">
+                        <i class="fa-solid fa-sparkles text-yellow-400"></i>
+                        <span>Next-Generation ATS Optimizer</span>
+                    </div>
+                    <h1 class="hero-title reveal-on-scroll" style="--reveal-delay: 0.3s">
+                        Analyze. Match. Hire.
+                    </h1>
+                    <h1 class="hero-title reveal-on-scroll" style="--reveal-delay: 0.5s">
+                        Smarter Hiring Starts Here. <span class="text-glow-gold"></span>
+                    </h1>
+                    <p class="hero-subtitle-text reveal-on-scroll" style="--reveal-delay: 0.7s">
+                        An advanced, open-learning resume screening pipeline. Parse PDFs, extract key technical
+                        keywords, and rank applications instantly using TF-IDF term weights and Cosine Similarity
+                        alignments.
+                    </p>
+                    <div class="hero-cta-buttons reveal-on-scroll" style="--reveal-delay: 0.9s">
+                        {% if logged_in %}
+                        <a href="#" onclick="navigateToTab('dashboard'); return false;"
+                            class="submit-button cta-btn glow-amber">
+                            <span>Launch Workspace <i class="fa-solid fa-arrow-right"></i></span>
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('login') }}" class="submit-button cta-btn glow-amber">
+                            <span>Get Started <i class="fa-solid fa-arrow-right"></i></span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Features Display Matrix -->
+                <section class="features-grid">
+                    <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 1;">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <h3>PDF Extract & Parse</h3>
+                        <p>Leverages native pypdf parsers to extract plain text layouts from binary resume documents
+                            securely.</p>
+                    </div>
+
+                    <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 2;">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-spell-check"></i>
+                        </div>
+                        <h3>NLP Preprocessing</h3>
+                        <p>Uses NLTK tokenizers to remove stop-words, punctuations, and syntactic noise, exposing
+                            matching skill sets.</p>
+                    </div>
+
+                    <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 3;">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-square-root-variable"></i>
+                        </div>
+                        <h3>TF-IDF Cosine Math</h3>
+                        <p>Fits a vector matrix on job vocabulary to calculate cosine orientation metrics, establishing
+                            exact match ranks.</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- 2. DASHBOARD VIEW                              -->
+        <!-- ============================================== -->
+        <div id="view-dashboard" class="page-view">
+            {% if logged_in %}
+            <!-- Dashboard Header -->
+            <div class="wizard-header">
+                <h1 class="wizard-title">Your <span class="text-glow-gold">Dashboard</span></h1>
+                <p class="wizard-subtitle">Upload your resume to get started with AI-powered screening and analysis.</p>
+            </div>
+
+            <!-- Dashboard Content Grid -->
+            <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
+
+                <!-- Upload Resume Card -->
+                <div
+                    style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
+                    <h3
+                        style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-cloud-arrow-up" style="color: #FFD000;"></i> 1. Upload Candidate Resume
+                    </h3>
+
+                    <form id="dashboard-upload-form" enctype="multipart/form-data">
+                        <div class="upload-dropzone" id="dashboard-dropzone" style="cursor: pointer;">
+                            <input type="file" id="dashboard-file-input" name="resume" accept=".pdf" class="file-input">
+                            <div class="dropzone-content">
+                                <div class="dropzone-icon">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                </div>
+                                <h3>Drop your resume here</h3>
+                                <p>or <span class="browse-link">browse files</span> — PDF only</p>
+                            </div>
+                        </div>
+
+                        <!-- Selected file display -->
+                        <div id="dashboard-file-display"
+                            style="display: none; margin-top: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; align-items: center; gap: 1rem;">
+                            <i class="fa-solid fa-file-pdf" style="font-size: 1.5rem; color: #ef4444;"></i>
+                            <div style="flex: 1; min-width: 0;">
+                                <div id="dashboard-file-name"
+                                    style="font-weight: 600; color: #ffffff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                </div>
+                                <div id="dashboard-file-size" style="font-size: 0.8rem; color: var(--text-secondary);">
+                                </div>
+                            </div>
+                            <button type="button" id="dashboard-remove-file"
+                                style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem; padding: 0.5rem;">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+
+                        <!-- Upload button -->
+                        <button type="submit" class="submit-button glow-amber" id="dashboard-upload-btn"
+                            style="width: 100%; margin-top: 1.5rem;" disabled>
+                            <span class="btn-text"><i class="fa-solid fa-arrow-up-from-bracket"></i> Upload Resume</span>
+                        </button>
+
+                        <!-- Error / Success Messages -->
+                        <div id="dashboard-error-msg"
+                            style="display: none; margin-top: 1rem; padding: 0.8rem 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; color: #ef4444; font-size: 0.9rem;">
+                        </div>
+                        <div id="dashboard-success-msg"
+                            style="display: none; margin-top: 1rem; padding: 1.2rem 1rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; color: #10b981; font-size: 0.95rem; text-align: center;">
+                            <i class="fa-solid fa-circle-check"
+                                style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+                            <span></span>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Job Description Input Card -->
+                <div
+                    style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
+                    <h3
+                        style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: #ffffff; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-file-signature" style="color: #FFD000;"></i> 2. Target Job Description & Role
+                    </h3>
+
+                    <!-- Job Title Input -->
+                    <div style="margin-bottom: 1rem;">
+                        <label for="job-title-input" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; display: block;">Target Job Title / Role (Optional):</label>
+                        <input type="text" id="job-title-input" class="form-input" placeholder="e.g. Senior Software Engineer" style="width: 100%; border-radius: 10px; padding: 0.7.rem 1rem; background: rgba(10, 12, 18, 0.6); color: #ffffff; border: 1px solid var(--border-color);">
+                    </div>
+
+                    <!-- Quick Preset Badges -->
+                    <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); align-self: center;">Quick Presets:</span>
+                        <button type="button" class="jd-preset-btn" data-preset="swe">Software Engineer</button>
+                        <button type="button" class="jd-preset-btn" data-preset="fullstack">Full Stack Developer</button>
+                        <button type="button" class="jd-preset-btn" data-preset="ds">Data Scientist</button>
+                        <button type="button" class="jd-preset-btn" data-preset="devops">DevOps Engineer</button>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <textarea id="jd-input-text" rows="6" class="form-input"
+                            placeholder="Paste full job description, role requirements, and technical skills here..."
+                            style="width: 100%; border-radius: 12px; padding: 1rem; font-family: 'Inter', sans-serif; background: rgba(10, 12, 18, 0.6); color: #ffffff; border: 1px solid var(--border-color); resize: vertical;"></textarea>
+                    </div>
+
+                    <button type="button" class="submit-button glow-amber" id="run-analysis-btn"
+                        style="width: 100%;" disabled>
+                        <span class="btn-text"><i class="fa-solid fa-wand-magic-sparkles"></i> Run AI Match Analysis</span>
+                    </button>
+
+                    <div id="analysis-error-msg"
+                        style="display: none; margin-top: 1rem; padding: 0.8rem 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; color: #ef4444; font-size: 0.9rem;">
+                    </div>
+                </div>
+
+                <!-- Match Analysis Results Section -->
+                <div id="analysis-results-section" style="display: none; flex-direction: column; gap: 1.5rem;">
+                    
+                    <!-- Score Overview Card -->
+                    <div style="background: rgba(20, 22, 30, 0.6); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700; color: #ffffff; margin-bottom: 0.3rem;">
+                                    Screening Analysis Report
+                                </h4>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;" id="res-filename-display">
+                                    Target Document: resume.pdf
+                                </p>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1.2rem;">
+                                <!-- SVG Progress Gauge Ring -->
+                                <div class="score-ring-wrapper">
+                                    <svg class="score-ring-svg" width="90" height="90" viewBox="0 0 100 100">
+                                        <circle class="score-ring-bg" cx="50" cy="50" r="42" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" fill="transparent"></circle>
+                                        <circle id="score-ring-path" class="score-ring-path" cx="50" cy="50" r="42" stroke="url(#score-gradient)" stroke-width="8" stroke-linecap="round" fill="transparent" stroke-dasharray="264" stroke-dashoffset="264"></circle>
+                                        <defs>
+                                            <linearGradient id="score-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stop-color="#FFD000" />
+                                                <stop offset="100%" stop-color="#FF6A00" />
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <div class="score-ring-text">
+                                        <span id="res-match-percentage">0%</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div id="res-match-grade" class="grade-pill grade-strong">Strong Match</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">TF-IDF Cosine Score</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recommendation Box -->
+                        <div style="background: rgba(255, 255, 255, 0.03); border-left: 4px solid #FFD000; border-radius: 8px; padding: 1rem 1.2rem;">
+                            <h5 style="font-weight: 600; color: #ffffff; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fa-solid fa-lightbulb" style="color: #FFD000;"></i> Alignment Summary
+                            </h5>
+                            <p id="res-recommendation" style="color: var(--text-secondary); font-size: 0.92rem; margin: 0; line-height: 1.5;">
+                                Analyzing document alignment...
+                            </p>
+                        </div>
+
+                        <!-- Document stats footer -->
+                        <div style="display: flex; gap: 2rem; margin-top: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem;">
+                            <div><i class="fa-solid fa-file-text"></i> Resume Word Count: <strong id="res-resume-words" style="color: #fff;">0</strong></div>
+                            <div><i class="fa-solid fa-clipboard-list"></i> JD Word Count: <strong id="res-jd-words" style="color: #fff;">0</strong></div>
+                        </div>
+                    </div>
+
+                    <!-- Skills Matrix (Matched vs Missing) -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                        
+                        <!-- Matched Skills Card -->
+                        <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
+                            <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #10b981; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fa-solid fa-circle-check"></i> Matched Technical Skills
+                            </h4>
+                            <div id="res-matched-skills-container" class="skills-pill-grid">
+                                <span class="skill-pill matched-pill">Python</span>
+                            </div>
+                        </div>
+
+                        <!-- Missing Skills Card -->
+                        <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
+                            <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #f59e0b; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Missing Job Keywords
+                            </h4>
+                            <div id="res-missing-skills-container" class="skills-pill-grid">
+                                <span class="skill-pill missing-pill">Docker</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ATS Readiness Analysis Card -->
+                    <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fa-solid fa-file-shield" style="color: #6366f1;"></i> ATS Structure & Formatting Readiness
+                            </h4>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 0.9rem; color: var(--text-secondary);">ATS Score:</span>
+                                <span id="res-ats-score-badge" style="font-size: 1.1rem; font-weight: 800; color: #6366f1; background: rgba(99, 102, 241, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px; border: 1px solid rgba(99, 102, 241, 0.3);">0 / 100</span>
+                            </div>
+                        </div>
+
+                        <!-- Checks Grid -->
+                        <div id="res-ats-checks-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; margin-bottom: 1.2rem;">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <!-- ATS Recommendations -->
+                        <div style="background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 1rem;">
+                            <h5 style="font-size: 0.88rem; font-weight: 600; color: #ffffff; margin-bottom: 0.5rem;">
+                                <i class="fa-solid fa-list-check" style="color: #FFD000;"></i> Layout & Content Optimization Tips:
+                            </h5>
+                            <ul id="res-ats-tips-list" style="margin: 0; padding-left: 1.2rem; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Top Keyword Relevance Breakdown -->
+                    <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
+                        <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-chart-bar" style="color: #FFD000;"></i> Key JD Term Frequency Weights
+                        </h4>
+                        <div id="res-keywords-container" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                            <!-- Keyword bars populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Report Export Action Toolbar -->
+                    <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 1rem;">
+                        <button type="button" class="action-btn" id="btn-copy-summary" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; transition: all 0.2s;">
+                            <i class="fa-solid fa-copy"></i> Copy Summary
+                        </button>
+                        <button type="button" class="action-btn" id="btn-print-report" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; transition: all 0.2s;">
+                            <i class="fa-solid fa-print"></i> Print / Save PDF Report
+                        </button>
+                        <button type="button" class="action-btn" id="btn-export-json" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; transition: all 0.2s;">
+                            <i class="fa-solid fa-download"></i> Export Raw JSON
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Inspection Modal -->
+                <div id="inspection-modal" class="modal-overlay" style="display: none;">
+                    <div class="modal-card">
+                        <div class="modal-header">
+                            <h3 id="modal-title" style="font-family: 'Outfit', sans-serif; margin: 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.2rem; color: #ffffff;">
+                                <i class="fa-solid fa-file-lines" style="color: #FFD000;"></i> Candidate Report Inspection
+                            </h3>
+                            <button type="button" id="modal-close-btn" class="modal-close-icon">&times;</button>
+                        </div>
+                        <div class="modal-body" id="modal-body-content" style="display: flex; flex-direction: column; gap: 1.2rem; padding: 1.5rem 0;">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                        <div class="modal-footer" style="display: flex; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                            <button type="button" class="action-btn" id="modal-close-footer-btn" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-color); color: #ffffff; padding: 0.5rem 1.2rem; border-radius: 8px; cursor: pointer;">Close</button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Candidate Analysis History Section -->
+                <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 700; color: #ffffff; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fa-solid fa-history" style="color: #FFD000;"></i> Candidate Screening History
+                            </h3>
+                            <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0;">Review past resume scans, score ranks, and matched technical skills.</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.8rem;">
+                            <button type="button" id="btn-refresh-history" class="action-btn" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+                                <i class="fa-solid fa-rotate-right"></i> Refresh
+                            </button>
+                            <button type="button" id="btn-clear-history" class="action-btn" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+                                <i class="fa-solid fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search & Filter Bar -->
+                    <div style="margin-bottom: 1.2rem; display: flex; gap: 1rem;">
+                        <input type="text" id="history-search-input" placeholder="Search by filename or job title..." style="flex: 1; padding: 0.6rem 1rem; border-radius: 8px; background: rgba(10, 12, 18, 0.6); color: #ffffff; border: 1px solid var(--border-color); font-size: 0.88rem;">
+                    </div>
+
+                    <!-- History Table Container -->
+                    <div style="overflow-x: auto;">
+                        <table class="history-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    <th style="padding: 0.8rem 1rem;">Date</th>
+                                    <th style="padding: 0.8rem 1rem;">Resume Filename</th>
+                                    <th style="padding: 0.8rem 1rem;">Job Title</th>
+                                    <th style="padding: 0.8rem 1rem;">Match Score</th>
+                                    <th style="padding: 0.8rem 1rem;">ATS Score</th>
+                                    <th style="padding: 0.8rem 1rem; text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body">
+                                <!-- Table rows inserted by JS -->
+                            </tbody>
+                        </table>
+                        <div id="history-empty-state" style="display: none; padding: 2.5rem; text-align: center; color: var(--text-secondary); font-size: 0.92rem;">
+                            <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 0.8rem; display: block; opacity: 0.5;"></i>
+                            No screening history found. Upload a resume and run match analysis to get started.
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Quick Actions & Trust Badges -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+
+                    <!-- Profile Card -->
+                    <div
+                        style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem;">
+                        <div
+                            style="width: 60px; height: 60px; border-radius: 14px; background: linear-gradient(135deg, rgba(0, 157, 255, 0.2), rgba(99, 102, 241, 0.2)); border: 1px solid rgba(0, 157, 255, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #ffffff;">
+                            <i class="fa-solid fa-circle-user"></i>
+                        </div>
+                        <h3
+                            style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #ffffff; margin: 0;">
+                            Welcome, {{ username }}</h3>
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0;">You're signed in and
+                            ready to run automated candidate screening.</p>
+                    </div>
+                </div>
+
+                <!-- Trust Badges -->
+                <div class="trust-badges-grid">
+                    <div class="trust-badge-card">
+                        <div class="badge-icon">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <div class="badge-text">
+                            <h5>Secure Storage</h5>
+                            <p>Your uploaded resumes are stored securely on our servers.</p>
+                        </div>
+                    </div>
+                    <div class="trust-badge-card">
+                        <div class="badge-icon">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <div class="badge-text">
+                            <h5>Instant Upload</h5>
+                            <p>Fast and reliable PDF uploads with no processing delays.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            {% else %}
+            <!-- Authentication Required Warning -->
+            <div
+                style="max-width: 600px; margin: 4rem auto; text-align: center; background: rgba(17, 24, 39, 0.6); border: 1px solid var(--border-color); padding: 3rem 2rem; border-radius: 18px; backdrop-filter: blur(12px);">
+                <div style="font-size: 3.5rem; color: #FFD000; margin-bottom: 1.5rem;">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h2 style="font-size: 1.8rem; color: #ffffff; margin-bottom: 1rem; font-family: 'Outfit', sans-serif;">
+                    Workspace Access Protected</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1rem; line-height: 1.6;">
+                    Please sign in or create an account to access your dashboard and resume tools.
+                </p>
+                <a href="{{ url_for('login') }}" class="submit-button glow-amber"
+                    style="display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none;">
+                    <span><i class="fa-solid fa-right-to-bracket"></i> Sign In / Create Account</span>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ============================================== -->
+        <!-- 3. HOW IT WORKS VIEW                          -->
+        <!-- ============================================== -->
+        <div id="view-how-it-works" class="page-view">
+            <section class="how-it-works-view">
+                <div class="section-title-center">
+                    <h2>How It Works</h2>
+                    <p>Learn how our intelligent parser processes resume documents step-by-step</p>
+                </div>
+
+                <div class="workflow-timeline">
+                    <div class="workflow-card">
+                        <span class="workflow-step-num">01</span>
+                        <i class="fa-solid fa-cloud-arrow-up workflow-icon"></i>
+                        <h3>1. Upload Resume</h3>
+                        <p>Submit candidate resume documents in PDF format safely. Our system parses directories
+                            immediately.</p>
+                    </div>
+
+                    <div class="workflow-card">
+                        <span class="workflow-step-num">02</span>
+                        <i class="fa-solid fa-file-pdf workflow-icon"></i>
+                        <h3>2. Extract Text (PyPDF2)</h3>
+                        <p>Extract raw string details using native binary PDF layout segment text readers.</p>
+                    </div>
+
+                    <div class="workflow-card">
+                        <span class="workflow-step-num">03</span>
+                        <i class="fa-solid fa-microchip workflow-icon"></i>
+                        <h3>3. NLP Processing</h3>
+                        <p>Clean raw output string sequences by filtering grammatical stop-words and punctuations using
+                            tokenizers.</p>
+                    </div>
+
+                    <div class="workflow-card">
+                        <span class="workflow-step-num">04</span>
+                        <i class="fa-solid fa-chart-simple workflow-icon"></i>
+                        <h3>4. TF-IDF Weights</h3>
+                        <p>Measure term relevance weight indexes mapping both candidate resume lists and vacancies.</p>
+                    </div>
+
+                    <div class="workflow-card">
+                        <span class="workflow-step-num">05</span>
+                        <i class="fa-solid fa-compass workflow-icon"></i>
+                        <h3>5. Cosine Similarity</h3>
+                        <p>Compute relative spatial angular orientations to establish skill compliance matches.</p>
+                    </div>
+
+                    <div class="workflow-card">
+                        <span class="workflow-step-num">06</span>
+                        <i class="fa-solid fa-wand-magic-sparkles workflow-icon"></i>
+                        <h3>6. AI Match Score</h3>
+                        <p>Verify compliant skill counts to output percentage confidence matching ranks.</p>
+                    </div>
+
+                    <div class="workflow-card">
+                        <span class="workflow-step-num">07</span>
+                        <i class="fa-solid fa-ranking-star workflow-icon"></i>
+                        <h3>7. Candidate Ranking</h3>
+                        <p>Output ranked lists to screen and highlight compliant technical candidates immediately.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- 4. ABOUT VIEW                                  -->
+        <!-- ============================================== -->
+        <div id="view-about" class="page-view">
+            <section class="about-view">
+                <div class="section-title-center">
+                    <h2>About Us</h2>
+                    <p>Discover the intelligence suite behind automated talent screening</p>
+                </div>
+
+                <div class="about-grid">
+                    <div class="about-card">
+                        <h3>What is Hire𝒽ive?</h3>
+                        <p>
+                            Hire𝒽ive is a next-generation resume screening intelligence platform designed to bridge the
+                            gap between job description requirements and applicant skill sets. By automating resume
+                            tokenization and text analysis, Hire𝒽ive allows recruiters and managers to instantly rank
+                            candidates with scientific precision.
+                        </p>
+
+                        <h3>Project Objective</h3>
+                        <p>
+                            The core objective of the Hire𝒽ive suite is to eliminate human bias, subjectivity, and
+                            parsing delays from the early stages of candidate screening. Through mathematical vector
+                            models, the platform identifies technical skill alignment objectively under a fraction of a
+                            second.
+                        </p>
+
+                        <h3>Technologies Used</h3>
+                        <div class="tech-grid">
+                            <div class="tech-item">
+                                <i class="fa-brands fa-python"></i>
+                                <span>Python Core</span>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fa-solid fa-cubes"></i>
+                                <span>Flask Backend</span>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fa-solid fa-file-lines"></i>
+                                <span>PyPDF2 Parsing</span>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fa-solid fa-brain"></i>
+                                <span>NLTK Regex NLP</span>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fa-solid fa-calculator"></i>
+                                <span>TF-IDF Vectorizer</span>
+                            </div>
+                            <div class="tech-item">
+                                <i class="fa-solid fa-database"></i>
+                                <span>MySQL Server</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-sidebar-card">
+                        <div class="benefit-item">
+                            <i class="fa-solid fa-circle-check benefit-icon"></i>
+                            <div class="benefit-text">
+                                <h4>Why it was built</h4>
+                                <p>To reduce standard applicant screening time by up to 90%, transforming long stacks of
+                                    papers into structured compliance scores.</p>
+                            </div>
+                        </div>
+
+                        <div class="benefit-item">
+                            <i class="fa-solid fa-circle-check benefit-icon"></i>
+                            <div class="benefit-text">
+                                <h4>Key Benefits</h4>
+                                <p>Objective candidate ranks, automatic core and missing skill tags generation, clean
+                                    TF-IDF term histograms, and secure user logins.</p>
+                            </div>
+                        </div>
+
+                        <div class="benefit-item">
+                            <i class="fa-solid fa-circle-check benefit-icon"></i>
+                            <div class="benefit-text">
+                                <h4>Future Scope</h4>
+                                <p>LLM API integration for feedback comments, automated resume layout formatting, and
+                                    multi-vacancy screening support.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- 5. NEWS VIEW                                   -->
+        <!-- ============================================== -->
+        <div id="view-news" class="page-view">
+            <section class="news-view">
+                <div class="section-title-center">
+                    <h2>Latest Tech & Career Updates</h2>
+                    <p>Insights on AI, developer markets, resume tactics, and interview preparation</p>
+                </div>
+
+                <div class="news-grid">
+                    <div class="news-card">
+                        <div class="news-content">
+                            <span class="news-tag">AI News</span>
+                            <h3>Generative LLMs in Technical ATS Parsers</h3>
+                            <p>How deep learning architectures are complementing traditional keyword vectors to evaluate
+                                developer experience contextually.</p>
+                            <div class="news-footer">
+                                <span><i class="fa-regular fa-calendar"></i> July 2026</span>
+                                <span>By AI Research Team</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="news-card">
+                        <div class="news-content">
+                            <span class="news-tag">Python</span>
+                            <h3>Parsing Complex PDF Tables in Python 3.12</h3>
+                            <p>A comparison of PyPDF2 layout extractors and alternative parser architectures to
+                                reconstruct structured resume fields cleanly.</p>
+                            <div class="news-footer">
+                                <span><i class="fa-regular fa-calendar"></i> June 2026</span>
+                                <span>By Dev Team</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="news-card">
+                        <div class="news-content">
+                            <span class="news-tag">Machine Learning</span>
+                            <h3>Understanding Vector Angle Cosine Similarity</h3>
+                            <p>A breakdown of the cosine calculation method mapping multidimensional token coordinate
+                                alignments for talent match scoring.</p>
+                            <div class="news-footer">
+                                <span><i class="fa-regular fa-calendar"></i> May 2026</span>
+                                <span>By Data Science Group</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="news-card">
+                        <div class="news-content">
+                            <span class="news-tag">Resume Tips</span>
+                            <h3>ATS-Friendly Resume Formatting Rules</h3>
+                            <p>Practical tips for candidates: avoiding complex canvas graphics, using semantic text
+                                layouts, and prioritizing structured headings.</p>
+                            <div class="news-footer">
+                                <span><i class="fa-regular fa-calendar"></i> April 2026</span>
+                                <span>By Career Coaching</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="news-card">
+                        <div class="news-content">
+                            <span class="news-tag">Interview Preparation</span>
+                            <h3>Tackling System Design Questions in 2026</h3>
+                            <p>Key topics technical candidates must prepare, covering load balancers, database sharding,
+                                caching, and rate limiters.</p>
+                            <div class="news-footer">
+                                <span><i class="fa-regular fa-calendar"></i> March 2026</span>
+                                <span>By Talent Team</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="news-card">
+                        <div class="news-content">
+                            <span class="news-tag">Job Market</span>
+                            <h3>Developer Internship Trends & Scope</h3>
+                            <p>An overview of tech markets, covering remote team expansion, cloud platform growth, and
+                                the rise of full-stack junior positions.</p>
+                            <div class="news-footer">
+                                <span><i class="fa-regular fa-calendar"></i> February 2026</span>
+                                <span>By Market Insights</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- 6. CONTACT US VIEW                             -->
+        <!-- ============================================== -->
+        <div id="view-contact" class="page-view">
+            <section class="contact-view">
+                <div class="section-title-center">
+                    <h2>Contact Us</h2>
+                    <p>Have questions or suggestions? Get in touch with our team</p>
+                </div>
+
+                <div class="contact-grid">
+                    <div class="contact-form-card">
+                        <h3>Send us a Message</h3>
+                        <form onsubmit="event.preventDefault(); alert('Message sent successfully! (Demo Mode)');">
+                            <div class="form-group">
+                                <label for="contact-name">Name</label>
+                                <input type="text" id="contact-name" class="form-input" required placeholder="John Doe">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email">Email Address</label>
+                                <input type="email" id="contact-email" class="form-input" required
+                                    placeholder="john@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-message">Message</label>
+                                <textarea id="contact-message" class="form-input" rows="5" required
+                                    placeholder="Your message here..."></textarea>
+                            </div>
+                            <button type="submit" class="submit-button glow-amber">
+                                <span>Send Message <i class="fa-solid fa-paper-plane"></i></span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="contact-info-card">
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+                            <div class="info-text">
+                                <h4>Email Support</h4>
+                                <p><a href="mailto:support@hirehive.ai">support@hirehive.ai</a></p>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div class="info-text">
+                                <h4>Phone Line</h4>
+                                <p>+1 (555) 304-4321</p>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fa-brands fa-github"></i>
+                            </div>
+                            <div class="info-text">
+                                <h4>GitHub Code</h4>
+                                <p><a href="https://github.com/hirehive-ai" target="_blank">github.com/hirehive-ai</a>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fa-brands fa-linkedin"></i>
+                            </div>
+                            <div class="info-text">
+                                <h4>LinkedIn Profile</h4>
+                                <p><a href="https://linkedin.com/company/hirehive-ai"
+                                        target="_blank">linkedin.com/company/hirehive-ai</a></p>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div class="info-text">
+                                <h4>Office Location</h4>
+                                <p>San Francisco, CA, USA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <footer class="app-footer">
+                    <div>
+                        &copy; 2026 Hire𝒽ive. All rights reserved.
+                    </div>
+                    <div class="footer-socials">
+                        <a href="https://github.com/hirehive-ai" target="_blank"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://linkedin.com/company/hirehive-ai" target="_blank"><i
+                                class="fa-brands fa-linkedin"></i></a>
+                        <a href="mailto:support@hirehive.ai"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </footer>
+            </section>
+        </div>
+
+    </div>
+
+
+    <!-- Jinja config for external JS -->
+    <script id="app-config-data" type="application/json">
+        {
+            "loggedIn": {{ logged_in|tojson }},
+            "loginUrl": {{ url_for('login')|tojson }}
+        }
+    </script>
+    <script>
+        try {
+            window.__APP_CONFIG = JSON.parse(document.getElementById('app-config-data').textContent);
+        } catch (e) {
+            window.__APP_CONFIG = { loggedIn: false, loginUrl: '/login' };
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+
+
+
+
+</body>
+
+</html>
