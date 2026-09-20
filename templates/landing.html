@@ -113,67 +113,144 @@
         <!-- 1. HOME VIEW                                   -->
         <!-- ============================================== -->
         <div id="view-home" class="page-view active">
-            <main class="landing-hero">
-                <div class="hero-content">
+            <main class="landing-hero-split">
+                <!-- Left Hero Text & CTA -->
+                <div class="hero-content-left">
                     <div class="hero-badge reveal-on-scroll" style="--reveal-delay: 0.1s">
                         <i class="fa-solid fa-sparkles text-yellow-400"></i>
-                        <span>Next-Generation ATS Optimizer</span>
+                        <span>AI-POWERED RESUME SCREENER v2.0</span>
                     </div>
                     <h1 class="hero-title reveal-on-scroll" style="--reveal-delay: 0.3s">
-                        Analyze. Match. Hire.
+                        Screen Resumes.<br>
+                        <span class="text-glow-gold">Rank Candidates.</span><br>
+                        Hire Smarter.
                     </h1>
-                    <h1 class="hero-title reveal-on-scroll" style="--reveal-delay: 0.5s">
-                        Smarter Hiring Starts Here. <span class="text-glow-gold"></span>
-                    </h1>
-                    <p class="hero-subtitle-text reveal-on-scroll" style="--reveal-delay: 0.7s">
-                        An advanced, open-learning resume screening pipeline. Parse PDFs, extract key technical
-                        keywords, and rank applications instantly using TF-IDF term weights and Cosine Similarity
-                        alignments.
+                    <p class="hero-subtitle-text reveal-on-scroll" style="--reveal-delay: 0.5s">
+                        Parse PDF documents, evaluate TF-IDF keyword weights, measure Cosine Similarity, and verify ATS formatting compliance in milliseconds.
                     </p>
-                    <div class="hero-cta-buttons reveal-on-scroll" style="--reveal-delay: 0.9s">
+                    
+                    <div class="hero-cta-buttons reveal-on-scroll" style="--reveal-delay: 0.7s; justify-content: flex-start;">
                         {% if logged_in %}
-                        <a href="#" onclick="navigateToTab('dashboard'); return false;"
-                            class="submit-button cta-btn glow-amber">
-                            <span>Launch Workspace <i class="fa-solid fa-arrow-right"></i></span>
+                        <a href="#" onclick="navigateToTab('dashboard'); return false;" class="submit-button cta-btn glow-amber">
+                            <span><i class="fa-solid fa-wand-magic-sparkles"></i> Launch Analyser Workspace</span>
                         </a>
                         {% else %}
                         <a href="{{ url_for('login') }}" class="submit-button cta-btn glow-amber">
-                            <span>Get Started <i class="fa-solid fa-arrow-right"></i></span>
+                            <span><i class="fa-solid fa-right-to-bracket"></i> Get Started Free</span>
                         </a>
                         {% endif %}
+                        <a href="#" onclick="navigateToTab('how-it-works'); return false;" class="action-btn" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #fff; padding: 0.8rem 1.6rem; border-radius: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-circle-play" style="color: #FFD000;"></i> How It Works
+                        </a>
+                    </div>
+
+                    <!-- Live Stats Bar -->
+                    <div class="hero-stats-bar reveal-on-scroll" style="--reveal-delay: 0.9s;">
+                        <div class="stat-item">
+                            <div class="stat-value">99.4%</div>
+                            <div class="stat-label">Match Precision</div>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <div class="stat-value">&lt; 0.2s</div>
+                            <div class="stat-label">Analysis Speed</div>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <div class="stat-value">100%</div>
+                            <div class="stat-label">ATS Layout Check</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Features Display Matrix -->
-                <section class="features-grid">
-                    <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 1;">
-                        <div class="feature-icon">
-                            <i class="fa-solid fa-file-pdf"></i>
+                <!-- Right Hero Interactive Showcase Card -->
+                <div class="hero-showcase-right reveal-on-scroll" style="--reveal-delay: 0.4s;">
+                    <div class="showcase-card-glow"></div>
+                    <div class="showcase-card">
+                        <div class="showcase-header">
+                            <div class="showcase-dots">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                            </div>
+                            <span class="showcase-title"><i class="fa-solid fa-bolt" style="color: #FFD000;"></i> Live Match Preview</span>
                         </div>
-                        <h3>PDF Extract & Parse</h3>
-                        <p>Leverages native pypdf parsers to extract plain text layouts from binary resume documents
-                            securely.</p>
-                    </div>
+                        
+                        <div class="showcase-body">
+                            <!-- Document Info Bar -->
+                            <div class="showcase-doc-bar">
+                                <i class="fa-solid fa-file-pdf" style="color: #ef4444; font-size: 1.5rem;"></i>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Senior_Python_Developer.pdf</div>
+                                    <div style="font-size: 0.78rem; color: var(--text-secondary);">Target Role: Senior Software Engineer</div>
+                                </div>
+                                <span class="showcase-pill-badge">PARSED</span>
+                            </div>
 
-                    <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 2;">
-                        <div class="feature-icon">
-                            <i class="fa-solid fa-spell-check"></i>
-                        </div>
-                        <h3>NLP Preprocessing</h3>
-                        <p>Uses NLTK tokenizers to remove stop-words, punctuations, and syntactic noise, exposing
-                            matching skill sets.</p>
-                    </div>
+                            <!-- Animated Gauge Preview -->
+                            <div class="showcase-score-box">
+                                <div class="showcase-gauge">
+                                    <svg width="80" height="80" viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="40" stroke="rgba(255, 255, 255, 0.1)" stroke-width="8" fill="none"></circle>
+                                        <circle cx="50" cy="50" r="40" stroke="url(#showcase-grad)" stroke-width="8" stroke-linecap="round" fill="none" stroke-dasharray="251" stroke-dashoffset="35" style="transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
+                                        <defs>
+                                            <linearGradient id="showcase-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stop-color="#FFD000" />
+                                                <stop offset="100%" stop-color="#10b981" />
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <span class="showcase-score-val">88.5%</span>
+                                </div>
+                                <div>
+                                    <div class="grade-pill grade-strong" style="margin-bottom: 0.3rem;">Strong Alignment</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">TF-IDF Vector Cosine Similarity</div>
+                                </div>
+                            </div>
 
-                    <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 3;">
-                        <div class="feature-icon">
-                            <i class="fa-solid fa-square-root-variable"></i>
+                            <!-- Skills Matched Preview -->
+                            <div class="showcase-skills-box">
+                                <div style="font-size: 0.82rem; font-weight: 600; color: #10b981; margin-bottom: 0.4rem;"><i class="fa-solid fa-circle-check"></i> Matched Technical Skills</div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                                    <span class="skill-pill matched-pill">Python</span>
+                                    <span class="skill-pill matched-pill">Flask</span>
+                                    <span class="skill-pill matched-pill">SQL</span>
+                                    <span class="skill-pill matched-pill">Docker</span>
+                                    <span class="skill-pill matched-pill">REST API</span>
+                                    <span class="skill-pill matched-pill">AWS</span>
+                                </div>
+                            </div>
                         </div>
-                        <h3>TF-IDF Cosine Math</h3>
-                        <p>Fits a vector matrix on job vocabulary to calculate cosine orientation metrics, establishing
-                            exact match ranks.</p>
                     </div>
-                </section>
+                </div>
             </main>
+
+            <!-- Features Display Matrix -->
+            <section class="features-grid">
+                <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 1;">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <h3>PDF Layout Parsing</h3>
+                    <p>Native PyPDF layout readers extract plain string details from multi-column resume layouts cleanly.</p>
+                </div>
+
+                <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 2;">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-spell-check"></i>
+                    </div>
+                    <h3>Regex & Skill Tokenization</h3>
+                    <p>Normalizes stop-words, punctuations, and syntax noise to expose exact technical competencies.</p>
+                </div>
+
+                <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 3;">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-square-root-variable"></i>
+                    </div>
+                    <h3>TF-IDF & Cosine Vectors</h3>
+                    <p>Computes angular spatial vector orientation scores to rank candidates objectively under 0.2s.</p>
+                </div>
+            </section>
         </div>
 
         <!-- ============================================== -->
