@@ -291,34 +291,38 @@ def dashboard():
 
 @app.route('/api/upload', methods=['POST'])
 def upload_resume():
-    """Handle PDF resume upload — validate, store, and return success immediately."""
+    """Handle PDF resume upload — validate, store, and return success immediately (single or multiple)."""
     if 'username' not in session:
         return jsonify({"success": False, "error": "Unauthorized. Please log in."}), 401
 
-    if 'resume' not in request.files:
+    files = request.files.getlist('resumes') or request.files.getlist('resume')
+    if not files or len(files) == 0 or files[0].filename == '':
         return jsonify({"success": False, "error": "No file uploaded."}), 400
 
-    file = request.files['resume']
+    if len(files) > 10:
+        return jsonify({"success": False, "error": "Maximum 10 resumes can be uploaded at a time in HR mode."}), 400
 
-    if file.filename == '':
-        return jsonify({"success": False, "error": "No file selected."}), 400
+    saved_filenames = []
+    for file in files:
+        if file and file.filename != '':
+            if not allowed_file(file.filename):
+                return jsonify({"success": False, "error": f"Invalid file '{file.filename}'. Only PDF files are allowed."}), 400
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            saved_filenames.append(filename)
 
-    if not allowed_file(file.filename):
-        return jsonify({"success": False, "error": "Only PDF files are allowed."}), 400
+    if not saved_filenames:
+        return jsonify({"success": False, "error": "No valid PDF files saved."}), 400
 
-    try:
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-        logger.info(f"Resume uploaded successfully: {filename}")
-        return jsonify({
-            "success": True,
-            "message": "Resume uploaded successfully!",
-            "filename": filename
-        })
-    except Exception as e:
-        logger.error(f"Upload failed: {e}")
-        return jsonify({"success": False, "error": "Upload failed. Please try again."}), 500
+    logger.info(f"Resumes uploaded successfully: {saved_filenames}")
+    return jsonify({
+        "success": True,
+        "message": f"{len(saved_filenames)} resume(s) uploaded successfully!",
+        "filename": saved_filenames[0],
+        "filenames": saved_filenames
+    })
+
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -566,54 +570,94 @@ def analyze_resume_against_jd(resume_text, jd_text):
 
 @app.route('/api/analyze', methods=['POST'])
 def analyze():
-    """Extract text from resume PDF, process NLP, compute match against Job Description, and store history."""
+    """Extract text from resume PDF(s), process NLP, compute match against Job Description, rank candidates, and store history."""
     if 'username' not in session:
         return jsonify({"success": False, "error": "Unauthorized. Please log in."}), 401
 
     data = request.get_json() or {}
-    filename = data.get('filename')
+    filenames = data.get('filenames') or []
+    single_filename = data.get('filename')
+    if single_filename and not filenames:
+        filenames = [single_filename]
+
     jd_text = data.get('job_description', '').strip()
     job_title = data.get('job_title', 'General Match').strip() or 'General Match'
+    mode = data.get('mode', 'candidate')
 
-    if not filename:
+    if not filenames or len(filenames) == 0:
         return jsonify({"success": False, "error": "No resume file specified."}), 400
 
     if not jd_text:
         return jsonify({"success": False, "error": "Please provide a job description."}), 400
 
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename))
-    if not os.path.exists(filepath):
-        return jsonify({"success": False, "error": "Uploaded resume file not found."}), 404
+    username = session.get('username')
+    results = []
 
-    # Extract text from uploaded PDF
-    resume_text = extract_text_from_pdf(filepath)
-    if not resume_text:
-        return jsonify({"success": False, "error": "Unable to extract readable text from PDF."}), 400
+    for fname in filenames:
+        sec_fname = secure_filename(fname)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], sec_fname)
+        if not os.path.exists(filepath):
+            logger.warning(f"File not found during analysis: {sec_fname}")
+            continue
 
-    result = analyze_resume_against_jd(resume_text, jd_text)
-    result['success'] = True
-    result['filename'] = filename
-    result['job_title'] = job_title
+        resume_text = extract_text_from_pdf(filepath)
+        if not resume_text:
+            logger.warning(f"Could not extract text from PDF: {sec_fname}")
+            continue
 
-    # Log analysis result to Database (MySQL or SQLite)
-    try:
-        username = session.get('username')
-        inserted_id = db_query(
-            "INSERT INTO analyses (username, filename, job_title, match_score, grade, matched_skills, missing_skills, ats_score) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-            (
-                username, filename, job_title,
-                result['match_percentage'], result['grade'],
-                json.dumps(result['matched_skills']),
-                json.dumps(result['missing_skills']),
-                result['ats_score']
-            ),
-            commit=True
-        )
-        result['id'] = inserted_id
-    except Exception as e:
-        logger.warning(f"Unable to store analysis record in database: {e}")
+        res = analyze_resume_against_jd(resume_text, jd_text)
+        res['filename'] = sec_fname
+        res['job_title'] = job_title
 
-    return jsonify(result)
+        # Store analysis result in Database
+        try:
+            inserted_id = db_query(
+                "INSERT INTO analyses (username, filename, job_title, match_score, grade, matched_skills, missing_skills, ats_score) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (
+                    username, sec_fname, job_title,
+                    res['match_percentage'], res['grade'],
+                    json.dumps(res['matched_skills']),
+                    json.dumps(res['missing_skills']),
+                    res['ats_score']
+                ),
+                commit=True
+            )
+            res['id'] = inserted_id
+        except Exception as e:
+            logger.warning(f"Unable to store analysis record in database: {e}")
+
+        results.append(res)
+
+    if not results:
+        return jsonify({"success": False, "error": "Unable to extract readable text from uploaded resume PDF(s)."}), 400
+
+    # Rank candidates from HIGH to LOW based on ATS Score (and secondary sort by match percentage)
+    results.sort(key=lambda x: (x.get('ats_score', 0), x.get('match_percentage', 0)), reverse=True)
+    for idx, cand in enumerate(results, start=1):
+        cand['rank'] = idx
+
+    top_cand = results[0]
+
+    return jsonify({
+        "success": True,
+        "mode": mode,
+        "is_batch": len(results) > 1,
+        "total_candidates": len(results),
+        "candidates": results,
+        "filename": top_cand['filename'],
+        "job_title": top_cand['job_title'],
+        "match_percentage": top_cand['match_percentage'],
+        "grade": top_cand['grade'],
+        "matched_skills": top_cand['matched_skills'],
+        "missing_skills": top_cand['missing_skills'],
+        "top_keywords": top_cand['top_keywords'],
+        "recommendation": top_cand['recommendation'],
+        "ats_analysis": top_cand['ats_analysis'],
+        "ats_score": top_cand['ats_score'],
+        "resume_word_count": top_cand['resume_word_count'],
+        "jd_word_count": top_cand['jd_word_count']
+    })
+
 
 
 @app.route('/api/history', methods=['GET'])

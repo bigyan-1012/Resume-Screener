@@ -14,22 +14,11 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=20260926_v5">
 </head>
 
 <body class="landing-page">
-    <!-- Splash Screen Intro -->
-    <div id="splash-screen" class="splash-screen">
-        <div class="splash-logo-container">
-            <div class="logo-container splash-logo-row">
-                <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Hire𝒽ive Logo"
-                    class="brand-logo-img splash-icon">
-                <h1 class="logo-text splash-logo-text">
-                    Hire<span class="logo-accent">𝒽</span>ive
-                </h1>
-            </div>
-        </div>
-    </div>
+    <!-- Floating Background Assets -->
 
     <!-- Floating Background Assets -->
     <div class="bg-gradient-background"></div>
@@ -112,7 +101,7 @@
         <!-- ============================================== -->
         <!-- 1. HOME VIEW                                   -->
         <!-- ============================================== -->
-        <div id="view-home" class="page-view active">
+        <div id="view-home" class="page-view">
             <main class="landing-hero-split">
                 <!-- Left Hero Text & CTA -->
                 <div class="hero-content-left">
@@ -129,7 +118,7 @@
                         Parse PDF documents, evaluate TF-IDF keyword weights, measure Cosine Similarity, and verify ATS formatting compliance in milliseconds.
                     </p>
                     
-                    <div class="hero-cta-buttons reveal-on-scroll" style="--reveal-delay: 0.7s; justify-content: flex-start;">
+                    <div class="hero-cta-buttons reveal-on-scroll" style="--reveal-delay: 0.7s; justify-content: center;">
                         {% if logged_in %}
                         <a href="#" onclick="navigateToTab('dashboard'); return false;" class="submit-button cta-btn glow-amber">
                             <span><i class="fa-solid fa-wand-magic-sparkles"></i> Launch Analyser Workspace</span>
@@ -144,113 +133,8 @@
                         </a>
                     </div>
 
-                    <!-- Live Stats Bar -->
-                    <div class="hero-stats-bar reveal-on-scroll" style="--reveal-delay: 0.9s;">
-                        <div class="stat-item">
-                            <div class="stat-value">99.4%</div>
-                            <div class="stat-label">Match Precision</div>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <div class="stat-value">&lt; 0.2s</div>
-                            <div class="stat-label">Analysis Speed</div>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <div class="stat-value">100%</div>
-                            <div class="stat-label">ATS Layout Check</div>
-                        </div>
                     </div>
-                </div>
-
-                <!-- Right Hero Interactive Showcase Card -->
-                <div class="hero-showcase-right reveal-on-scroll" style="--reveal-delay: 0.4s;">
-                    <div class="showcase-card-glow"></div>
-                    <div class="showcase-card">
-                        <div class="showcase-header">
-                            <div class="showcase-dots">
-                                <span class="dot red"></span>
-                                <span class="dot yellow"></span>
-                                <span class="dot green"></span>
-                            </div>
-                            <span class="showcase-title"><i class="fa-solid fa-bolt" style="color: #FFD000;"></i> Live Match Preview</span>
-                        </div>
-                        
-                        <div class="showcase-body">
-                            <!-- Document Info Bar -->
-                            <div class="showcase-doc-bar">
-                                <i class="fa-solid fa-file-pdf" style="color: #ef4444; font-size: 1.5rem;"></i>
-                                <div style="flex: 1;">
-                                    <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Senior_Python_Developer.pdf</div>
-                                    <div style="font-size: 0.78rem; color: var(--text-secondary);">Target Role: Senior Software Engineer</div>
-                                </div>
-                                <span class="showcase-pill-badge">PARSED</span>
-                            </div>
-
-                            <!-- Animated Gauge Preview -->
-                            <div class="showcase-score-box">
-                                <div class="showcase-gauge">
-                                    <svg width="80" height="80" viewBox="0 0 100 100">
-                                        <circle cx="50" cy="50" r="40" stroke="rgba(255, 255, 255, 0.1)" stroke-width="8" fill="none"></circle>
-                                        <circle cx="50" cy="50" r="40" stroke="url(#showcase-grad)" stroke-width="8" stroke-linecap="round" fill="none" stroke-dasharray="251" stroke-dashoffset="35" style="transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
-                                        <defs>
-                                            <linearGradient id="showcase-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stop-color="#FFD000" />
-                                                <stop offset="100%" stop-color="#10b981" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                    <span class="showcase-score-val">88.5%</span>
-                                </div>
-                                <div>
-                                    <div class="grade-pill grade-strong" style="margin-bottom: 0.3rem;">Strong Alignment</div>
-                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">TF-IDF Vector Cosine Similarity</div>
-                                </div>
-                            </div>
-
-                            <!-- Skills Matched Preview -->
-                            <div class="showcase-skills-box">
-                                <div style="font-size: 0.82rem; font-weight: 600; color: #10b981; margin-bottom: 0.4rem;"><i class="fa-solid fa-circle-check"></i> Matched Technical Skills</div>
-                                <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
-                                    <span class="skill-pill matched-pill">Python</span>
-                                    <span class="skill-pill matched-pill">Flask</span>
-                                    <span class="skill-pill matched-pill">SQL</span>
-                                    <span class="skill-pill matched-pill">Docker</span>
-                                    <span class="skill-pill matched-pill">REST API</span>
-                                    <span class="skill-pill matched-pill">AWS</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </main>
-
-            <!-- Features Display Matrix -->
-            <section class="features-grid">
-                <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 1;">
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-file-pdf"></i>
-                    </div>
-                    <h3>PDF Layout Parsing</h3>
-                    <p>Native PyPDF layout readers extract plain string details from multi-column resume layouts cleanly.</p>
-                </div>
-
-                <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 2;">
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-spell-check"></i>
-                    </div>
-                    <h3>Regex & Skill Tokenization</h3>
-                    <p>Normalizes stop-words, punctuations, and syntax noise to expose exact technical competencies.</p>
-                </div>
-
-                <div class="feature-card glass-hover-card reveal-on-scroll" style="--card-index: 3;">
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-square-root-variable"></i>
-                    </div>
-                    <h3>TF-IDF & Cosine Vectors</h3>
-                    <p>Computes angular spatial vector orientation scores to rank candidates objectively under 0.2s.</p>
-                </div>
-            </section>
         </div>
 
         <!-- ============================================== -->
@@ -258,237 +142,477 @@
         <!-- ============================================== -->
         <div id="view-dashboard" class="page-view">
             {% if logged_in %}
+            <!-- Mode Switcher Pill (Top Left Corner below Navbar) -->
+            <div class="analyser-mode-bar">
+                <div class="mode-toggle-pill">
+                    <button type="button" class="mode-toggle-btn active" id="btn-mode-candidate" onclick="setAnalyserMode('candidate')">
+                        <i class="fa-solid fa-user-graduate"></i> Candidate Mode
+                    </button>
+                    <button type="button" class="mode-toggle-btn" id="btn-mode-hr" onclick="setAnalyserMode('hr')">
+                        <i class="fa-solid fa-users-viewfinder"></i> HR / Recruiter Mode
+                    </button>
+                </div>
+            </div>
+
             <!-- Dashboard Header -->
             <div class="wizard-header">
-                <h1 class="wizard-title">Your <span class="text-glow-gold">Dashboard</span></h1>
-                <p class="wizard-subtitle">Upload your resume to get started with AI-powered screening and analysis.</p>
+                <h1 class="wizard-title" id="wizard-title-heading">Your <span class="text-glow-gold">Dashboard</span></h1>
+                <p class="wizard-subtitle" id="wizard-subtitle-text">Upload your resume to get started with AI-powered screening and analysis.</p>
+            </div>
+
+            <!-- Analyser Progress Stepper Bar -->
+            <div class="analyser-stepper-container" style="max-width: 900px; margin: 0 auto 1.2rem auto;">
+                <div class="analyser-stepper" style="display: flex; align-items: center; justify-content: space-between; background: rgba(20, 22, 30, 0.5); border: 1px solid var(--border-color); border-radius: 16px; padding: 0.8rem 1.5rem; backdrop-filter: blur(12px);">
+                    <div class="stepper-item active" id="stepper-step-1" onclick="switchAnalyserStep(1)" style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; transition: all 0.3s ease;">
+                        <span class="stepper-num" style="width: 28px; height: 28px; border-radius: 50%; background: #FFD000; color: #030712; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700;">1</span>
+                        <span class="stepper-text" style="font-size: 0.9rem; font-weight: 600; color: #ffffff;">Upload & Role Input</span>
+                    </div>
+                    <div class="stepper-line" id="stepper-line-2" style="flex: 1; height: 2px; background: rgba(255, 255, 255, 0.1); margin: 0 1rem;"></div>
+                    <div class="stepper-item" id="stepper-step-2" onclick="switchAnalyserStep(2)" style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; opacity: 0.5; transition: all 0.3s ease;">
+                        <span class="stepper-num" style="width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700;">2</span>
+                        <span class="stepper-text" style="font-size: 0.9rem; font-weight: 600; color: #ffffff;">Screening Report</span>
+                    </div>
+                    <div class="stepper-line" id="stepper-line-3" style="flex: 1; height: 2px; background: rgba(255, 255, 255, 0.1); margin: 0 1rem;"></div>
+                    <div class="stepper-item" id="stepper-step-3" onclick="switchAnalyserStep(3)" style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; opacity: 0.5; transition: all 0.3s ease;">
+                        <span class="stepper-num" style="width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700;">3</span>
+                        <span class="stepper-text" style="font-size: 0.9rem; font-weight: 600; color: #ffffff;">Resume Builder Coach</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Dashboard Content Grid -->
-            <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
+            <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2rem;">
 
-                <!-- Upload Resume Card -->
-                <div
-                    style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
-                    <h3
-                        style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fa-solid fa-cloud-arrow-up" style="color: #FFD000;"></i> 1. Upload Candidate Resume
-                    </h3>
+                <!-- ======================================================= -->
+                <!-- PART 1: PDF UPLOAD & TARGET ROLE INPUT                  -->
+                <!-- ======================================================= -->
+                <div id="analyser-part-1" class="analyser-step-view" style="display: flex; flex-direction: column; gap: 1.2rem;">
+                    <!-- Upload Resume Card -->
+                    <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
+                        <h3 id="upload-card-title" style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-cloud-arrow-up" style="color: #FFD000;"></i> 1. Upload Candidate PDF Resume
+                        </h3>
 
-                    <form id="dashboard-upload-form" enctype="multipart/form-data">
-                        <div class="upload-dropzone" id="dashboard-dropzone" style="cursor: pointer;">
-                            <input type="file" id="dashboard-file-input" name="resume" accept=".pdf" class="file-input">
-                            <div class="dropzone-content">
-                                <div class="dropzone-icon">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <form id="dashboard-upload-form" enctype="multipart/form-data">
+                            <div class="upload-dropzone" id="dashboard-dropzone" style="cursor: pointer;">
+                                <input type="file" id="dashboard-file-input" name="resume" accept=".pdf" class="file-input">
+                                <div class="dropzone-content">
+                                    <div class="dropzone-icon">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    </div>
+                                    <h3 id="dropzone-title">Drop your resume here</h3>
+                                    <p id="dropzone-subtitle">or <span class="browse-link">browse files</span> — PDF only</p>
                                 </div>
-                                <h3>Drop your resume here</h3>
-                                <p>or <span class="browse-link">browse files</span> — PDF only</p>
+                            </div>
+
+                            <!-- Single file display -->
+                            <div id="dashboard-file-display" style="display: none; margin-top: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; align-items: center; gap: 1rem;">
+                                <i class="fa-solid fa-file-pdf" style="font-size: 1.5rem; color: #ef4444;"></i>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div id="dashboard-file-name" style="font-weight: 600; color: #ffffff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    </div>
+                                    <div id="dashboard-file-size" style="font-size: 0.8rem; color: var(--text-secondary);">
+                                    </div>
+                                </div>
+                                <button type="button" id="dashboard-remove-file" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem; padding: 0.5rem;">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+
+                            <!-- Multiple files display container (HR Mode) -->
+                            <div id="dashboard-files-list" style="display: none; margin-top: 1rem; flex-direction: column; gap: 0.6rem;"></div>
+
+
+                            <!-- Upload button -->
+                            <button type="submit" class="submit-button glow-amber" id="dashboard-upload-btn" style="width: 100%; margin-top: 1.5rem;" disabled>
+                                <span class="btn-text"><i class="fa-solid fa-arrow-up-from-bracket"></i> Upload Resume</span>
+                            </button>
+
+                            <!-- Error / Success Messages -->
+                            <div id="dashboard-error-msg" style="display: none; margin-top: 1rem; padding: 0.8rem 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; color: #ef4444; font-size: 0.9rem;">
+                            </div>
+                            <div id="dashboard-success-msg" style="display: none; margin-top: 1rem; padding: 1.2rem 1rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; color: #10b981; font-size: 0.95rem; text-align: center;">
+                                <i class="fa-solid fa-circle-check" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+                                <span></span>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Job Description Input Card -->
+                    <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
+                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: #ffffff; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-file-signature" style="color: #FFD000;"></i> 2. Target Job Description & Role
+                        </h3>
+
+                        <!-- Job Title Input -->
+                        <div style="margin-bottom: 1rem;">
+                            <label for="job-title-input" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; display: block;">Target Job Title / Role (Optional):</label>
+                            <input type="text" id="job-title-input" class="form-input" placeholder="e.g. Senior Software Engineer" style="width: 100%; border-radius: 10px; padding: 0.7rem 1rem; background: rgba(10, 12, 18, 0.6); color: #ffffff; border: 1px solid var(--border-color);">
+                        </div>
+
+                        <!-- Quick Preset Badges -->
+                        <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;">
+                            <span style="font-size: 0.85rem; color: var(--text-secondary); align-self: center;">Quick Presets:</span>
+                            <button type="button" class="jd-preset-btn" data-preset="swe">Software Engineer</button>
+                            <button type="button" class="jd-preset-btn" data-preset="fullstack">Full Stack Developer</button>
+                            <button type="button" class="jd-preset-btn" data-preset="ds">Data Scientist</button>
+                            <button type="button" class="jd-preset-btn" data-preset="devops">DevOps Engineer</button>
+                        </div>
+
+                        <div style="margin-bottom: 1rem;">
+                            <textarea id="jd-input-text" rows="6" class="form-input" placeholder="Paste full job description, role requirements, and technical skills here..." style="width: 100%; border-radius: 12px; padding: 1rem; font-family: 'Inter', sans-serif; background: rgba(10, 12, 18, 0.6); color: #ffffff; border: 1px solid var(--border-color); resize: vertical;"></textarea>
+                        </div>
+
+                        <button type="button" class="submit-button glow-amber" id="run-analysis-btn" style="width: 100%; font-size: 1.1rem; padding: 1rem;" disabled>
+                            <span class="btn-text"><i class="fa-solid fa-wand-magic-sparkles"></i> Start Analyzing Process</span>
+                        </button>
+
+                        <div id="analysis-error-msg" style="display: none; margin-top: 1rem; padding: 0.8rem 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; color: #ef4444; font-size: 0.9rem;">
+                        </div>
+                    </div>
+
+                    <!-- Candidate Analysis History Section (Step 1 Only) -->
+                    <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 700; color: #ffffff; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fa-solid fa-history" style="color: #FFD000;"></i> Candidate Screening History
+                                </h3>
+                                <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0;">Review past resume scans, score ranks, and matched technical skills.</p>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                <button type="button" id="btn-refresh-history" class="action-btn" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+                                    <i class="fa-solid fa-rotate-right"></i> Refresh
+                                </button>
+                                <button type="button" id="btn-clear-history" class="action-btn" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
+                                    <i class="fa-solid fa-trash"></i> Clear All
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Selected file display -->
-                        <div id="dashboard-file-display"
-                            style="display: none; margin-top: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; align-items: center; gap: 1rem;">
-                            <i class="fa-solid fa-file-pdf" style="font-size: 1.5rem; color: #ef4444;"></i>
-                            <div style="flex: 1; min-width: 0;">
-                                <div id="dashboard-file-name"
-                                    style="font-weight: 600; color: #ffffff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                </div>
-                                <div id="dashboard-file-size" style="font-size: 0.8rem; color: var(--text-secondary);">
+                        <!-- Search & Filter Bar -->
+                        <div style="margin-bottom: 1.2rem; display: flex; gap: 1rem;">
+                            <input type="text" id="history-search-input" placeholder="Search by filename or job title..." style="flex: 1; padding: 0.6rem 1rem; border-radius: 8px; background: rgba(10, 12, 18, 0.6); color: #ffffff; border: 1px solid var(--border-color); font-size: 0.88rem;">
+                        </div>
+
+                        <!-- History Table Container -->
+                        <div style="overflow-x: auto;">
+                            <table class="history-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        <th style="padding: 0.8rem 1rem;">Date</th>
+                                        <th style="padding: 0.8rem 1rem;">Resume Filename</th>
+                                        <th style="padding: 0.8rem 1rem;">Job Title</th>
+                                        <th style="padding: 0.8rem 1rem;">Match Score</th>
+                                        <th style="padding: 0.8rem 1rem;">ATS Score</th>
+                                        <th style="padding: 0.8rem 1rem; text-align: right;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-table-body">
+                                    <!-- Table rows inserted by JS -->
+                                </tbody>
+                            </table>
+                            <div id="history-empty-state" style="display: none; padding: 2.5rem; text-align: center; color: var(--text-secondary); font-size: 0.92rem;">
+                                <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 0.8rem; display: block; opacity: 0.5;"></i>
+                                No screening history found. Upload a resume and run match analysis to get started.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================================= -->
+                <!-- PART 2: SCREENING ANALYSIS REPORT VIEW                  -->
+                <!-- ======================================================= -->
+                <div id="analyser-part-2" class="analyser-step-view" style="display: none; flex-direction: column; gap: 1.5rem;">
+                    <!-- HR Mode Candidate Ranking Leaderboard Box -->
+                    <div id="hr-candidate-ranking-box" style="display: none; background: rgba(20, 22, 30, 0.65); border: 1px solid rgba(255, 208, 0, 0.35); border-radius: 16px; padding: 1.8rem; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px rgba(255, 208, 0, 0.08);">
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1rem;">
+                            <div>
+                                <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 700; color: #ffffff; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.6rem;">
+                                    <i class="fa-solid fa-trophy" style="color: #FFD000; font-size: 1.4rem;"></i> HR Candidate Ranking Leaderboard
+                                </h4>
+                                <p style="color: var(--text-secondary); font-size: 0.88rem; margin: 0;">
+                                    Candidates automatically ranked from high to low based on their ATS compatibility & skill match scores.
+                                </p>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="background: rgba(255, 208, 0, 0.1); border: 1px solid rgba(255, 208, 0, 0.3); padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #FFD000;">
+                                    <i class="fa-solid fa-users"></i> <span id="hr-stat-total-candidates">0 Candidates</span>
                                 </div>
                             </div>
-                            <button type="button" id="dashboard-remove-file"
-                                style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem; padding: 0.5rem;">
-                                <i class="fa-solid fa-trash-can"></i>
+                        </div>
+
+                        <!-- Ranked Candidate Table -->
+                        <div style="overflow-x: auto;">
+                            <table class="ranking-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        <th style="padding: 0.8rem 1rem; width: 70px;">Rank</th>
+                                        <th style="padding: 0.8rem 1rem;">Candidate Resume File</th>
+                                        <th style="padding: 0.8rem 1rem; width: 140px;">ATS Score</th>
+                                        <th style="padding: 0.8rem 1rem; width: 120px;">Match %</th>
+                                        <th style="padding: 0.8rem 1rem;">Match Grade</th>
+                                        <th style="padding: 0.8rem 1rem;">Matched Skills</th>
+                                        <th style="padding: 0.8rem 1rem; text-align: right; width: 150px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hr-ranking-table-body">
+                                    <!-- Dynamically populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="analysis-results-section" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <!-- Score Overview Card -->
+                        <div style="background: rgba(20, 22, 30, 0.6); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
+
+                            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem;">
+                                <div>
+                                    <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700; color: #ffffff; margin-bottom: 0.3rem;">
+                                        Screening Analysis Report
+                                    </h4>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;" id="res-filename-display">
+                                        Target Document: resume.pdf
+                                    </p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1.2rem;">
+                                    <!-- SVG Progress Gauge Ring -->
+                                    <div class="score-ring-wrapper">
+                                        <svg class="score-ring-svg" width="90" height="90" viewBox="0 0 100 100">
+                                            <circle class="score-ring-bg" cx="50" cy="50" r="42" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" fill="transparent"></circle>
+                                            <circle id="score-ring-path" class="score-ring-path" cx="50" cy="50" r="42" stroke="url(#score-gradient)" stroke-width="8" stroke-linecap="round" fill="transparent" stroke-dasharray="264" stroke-dashoffset="264"></circle>
+                                            <defs>
+                                                <linearGradient id="score-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                    <stop offset="0%" stop-color="#FFD000" />
+                                                    <stop offset="100%" stop-color="#FF6A00" />
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                        <div class="score-ring-text">
+                                            <span id="res-match-percentage">0%</span>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div id="res-match-grade" class="grade-pill grade-strong">Strong Match</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">TF-IDF Cosine Score</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recommendation Box -->
+                            <div style="background: rgba(255, 255, 255, 0.03); border-left: 4px solid #FFD000; border-radius: 8px; padding: 1rem 1.2rem;">
+                                <h5 style="font-weight: 600; color: #ffffff; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fa-solid fa-lightbulb" style="color: #FFD000;"></i> Alignment Summary
+                                </h5>
+                                <p id="res-recommendation" style="color: var(--text-secondary); font-size: 0.92rem; margin: 0; line-height: 1.5;">
+                                    Analyzing document alignment...
+                                </p>
+                            </div>
+
+                            <!-- Document stats footer -->
+                            <div style="display: flex; gap: 2rem; margin-top: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem;">
+                                <div><i class="fa-solid fa-file-text"></i> Resume Word Count: <strong id="res-resume-words" style="color: #fff;">0</strong></div>
+                                <div><i class="fa-solid fa-clipboard-list"></i> JD Word Count: <strong id="res-jd-words" style="color: #fff;">0</strong></div>
+                            </div>
+                        </div>
+
+                        <!-- Skills Matrix (Matched vs Missing) -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                            <!-- Matched Skills Card -->
+                            <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
+                                <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #10b981; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fa-solid fa-circle-check"></i> Matched Technical Skills Found
+                                </h4>
+                                <div id="res-matched-skills-container" class="skills-pill-grid">
+                                    <span class="skill-pill matched-pill">Python</span>
+                                </div>
+                            </div>
+
+                            <!-- Missing Skills Card -->
+                            <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
+                                <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #f59e0b; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Missing Skills for Target Role
+                                </h4>
+                                <div id="res-missing-skills-container" class="skills-pill-grid">
+                                    <span class="skill-pill missing-pill">Docker</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ATS Readiness Analysis Card -->
+                        <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
+                            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fa-solid fa-file-shield" style="color: #6366f1;"></i> ATS Structure & Formatting Readiness
+                                </h4>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 0.9rem; color: var(--text-secondary);">ATS Score:</span>
+                                    <span id="res-ats-score-badge" style="font-size: 1.1rem; font-weight: 800; color: #6366f1; background: rgba(99, 102, 241, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px; border: 1px solid rgba(99, 102, 241, 0.3);">0 / 100</span>
+                                </div>
+                            </div>
+
+                            <!-- Checks Grid -->
+                            <div id="res-ats-checks-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; margin-bottom: 1.2rem;">
+                                <!-- Populated by JS -->
+                            </div>
+
+                            <!-- ATS Recommendations -->
+                            <div style="background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 1rem;">
+                                <h5 style="font-size: 0.88rem; font-weight: 600; color: #ffffff; margin-bottom: 0.5rem;">
+                                    <i class="fa-solid fa-list-check" style="color: #FFD000;"></i> Layout & Formatting Tips:
+                                </h5>
+                                <ul id="res-ats-tips-list" style="margin: 0; padding-left: 1.2rem; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
+                                </ul>
+                            </div>
+                        </div>
+
+
+
+                        <!-- Primary CTA: Help Me To Build My Resume & Action Bar -->
+                        <div id="cta-resume-builder-card" style="background: linear-gradient(135deg, rgba(255, 208, 0, 0.1), rgba(255, 106, 0, 0.08)); border: 1px solid rgba(255, 208, 0, 0.3); border-radius: 16px; padding: 1.8rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                            <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 800; color: #ffffff; margin: 0;">
+                                Want to Maximize Your Resume ATS Score?
+                            </h4>
+                            <p style="color: var(--text-secondary); font-size: 0.92rem; margin: 0; max-width: 600px;">
+                                Get personalized recommendations on compulsory skills to add, extra skills to highlight, and irrelevant keywords to remove for this specific job role.
+                            </p>
+                            <button type="button" class="submit-button glow-amber" id="btn-go-to-resume-builder" style="padding: 1rem 2.2rem; font-size: 1.1rem;">
+                                <span><i class="fa-solid fa-wand-magic-sparkles"></i> Help Me to Build My Resume</span>
                             </button>
                         </div>
 
-                        <!-- Upload button -->
-                        <button type="submit" class="submit-button glow-amber" id="dashboard-upload-btn"
-                            style="width: 100%; margin-top: 1.5rem;" disabled>
-                            <span class="btn-text"><i class="fa-solid fa-arrow-up-from-bracket"></i> Upload Resume</span>
-                        </button>
-
-                        <!-- Error / Success Messages -->
-                        <div id="dashboard-error-msg"
-                            style="display: none; margin-top: 1rem; padding: 0.8rem 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; color: #ef4444; font-size: 0.9rem;">
+                        <!-- Export & Back Navigation Bar -->
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+                            <button type="button" class="action-btn" onclick="switchAnalyserStep(1)" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                                <i class="fa-solid fa-arrow-left"></i> Analyze Another Resume
+                            </button>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.8rem;">
+                                <button type="button" class="action-btn" id="btn-copy-summary" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                                    <i class="fa-solid fa-copy"></i> Copy Summary
+                                </button>
+                                <button type="button" class="action-btn" id="btn-print-report" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                                    <i class="fa-solid fa-print"></i> Print / Save PDF
+                                </button>
+                                <button type="button" class="action-btn" id="btn-export-json" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                                    <i class="fa-solid fa-download"></i> Export JSON
+                                </button>
+                            </div>
                         </div>
-                        <div id="dashboard-success-msg"
-                            style="display: none; margin-top: 1rem; padding: 1.2rem 1rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; color: #10b981; font-size: 0.95rem; text-align: center;">
-                            <i class="fa-solid fa-circle-check"
-                                style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
-                            <span></span>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Job Description Input Card -->
-                <div
-                    style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
-                    <h3
-                        style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: #ffffff; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fa-solid fa-file-signature" style="color: #FFD000;"></i> 2. Target Job Description & Role
-                    </h3>
-
-                    <!-- Job Title Input -->
-                    <div style="margin-bottom: 1rem;">
-                        <label for="job-title-input" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; display: block;">Target Job Title / Role (Optional):</label>
-                        <input type="text" id="job-title-input" class="form-input" placeholder="e.g. Senior Software Engineer" style="width: 100%; border-radius: 10px; padding: 0.7.rem 1rem; background: rgba(10, 12, 18, 0.6); color: #ffffff; border: 1px solid var(--border-color);">
-                    </div>
-
-                    <!-- Quick Preset Badges -->
-                    <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.85rem; color: var(--text-secondary); align-self: center;">Quick Presets:</span>
-                        <button type="button" class="jd-preset-btn" data-preset="swe">Software Engineer</button>
-                        <button type="button" class="jd-preset-btn" data-preset="fullstack">Full Stack Developer</button>
-                        <button type="button" class="jd-preset-btn" data-preset="ds">Data Scientist</button>
-                        <button type="button" class="jd-preset-btn" data-preset="devops">DevOps Engineer</button>
-                    </div>
-
-                    <div style="margin-bottom: 1rem;">
-                        <textarea id="jd-input-text" rows="6" class="form-input"
-                            placeholder="Paste full job description, role requirements, and technical skills here..."
-                            style="width: 100%; border-radius: 12px; padding: 1rem; font-family: 'Inter', sans-serif; background: rgba(10, 12, 18, 0.6); color: #ffffff; border: 1px solid var(--border-color); resize: vertical;"></textarea>
-                    </div>
-
-                    <button type="button" class="submit-button glow-amber" id="run-analysis-btn"
-                        style="width: 100%;" disabled>
-                        <span class="btn-text"><i class="fa-solid fa-wand-magic-sparkles"></i> Run AI Match Analysis</span>
-                    </button>
-
-                    <div id="analysis-error-msg"
-                        style="display: none; margin-top: 1rem; padding: 0.8rem 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; color: #ef4444; font-size: 0.9rem;">
                     </div>
                 </div>
 
-                <!-- Match Analysis Results Section -->
-                <div id="analysis-results-section" style="display: none; flex-direction: column; gap: 1.5rem;">
-                    
-                    <!-- Score Overview Card -->
-                    <div style="background: rgba(20, 22, 30, 0.6); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
-                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <!-- ======================================================= -->
+                <!-- PART 3: RESUME BUILDER & OPTIMIZATION ASSISTANT VIEW    -->
+                <!-- ======================================================= -->
+                <div id="analyser-part-3" class="analyser-step-view" style="display: none; flex-direction: column; gap: 1.5rem;">
+                    <!-- Header Banner -->
+                    <div style="background: linear-gradient(135deg, rgba(255, 208, 0, 0.08) 0%, rgba(255, 106, 0, 0.05) 100%); border: 1px solid rgba(255, 208, 0, 0.25); border-radius: 18px; padding: 2rem; backdrop-filter: blur(14px);">
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
                             <div>
-                                <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700; color: #ffffff; margin-bottom: 0.3rem;">
-                                    Screening Analysis Report
-                                </h4>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;" id="res-filename-display">
-                                    Target Document: resume.pdf
+                                <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 208, 0, 0.15); color: #FFD000; border: 1px solid rgba(255, 208, 0, 0.3); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.6rem;">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Resume Optimizer Coach
+                                </div>
+                                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; color: #ffffff; margin-bottom: 0.4rem;">
+                                    Tailored Optimization for <span id="builder-role-title" class="text-glow-gold">Senior Software Engineer</span>
+                                </h3>
+                                <p style="color: var(--text-secondary); font-size: 0.95rem; margin: 0; max-width: 650px;">
+                                    Based on your ATS screening result, follow these targeted recommendations to maximize keyword density and recruiter evaluation scores.
                                 </p>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 1.2rem;">
-                                <!-- SVG Progress Gauge Ring -->
-                                <div class="score-ring-wrapper">
-                                    <svg class="score-ring-svg" width="90" height="90" viewBox="0 0 100 100">
-                                        <circle class="score-ring-bg" cx="50" cy="50" r="42" stroke="rgba(255, 255, 255, 0.08)" stroke-width="8" fill="transparent"></circle>
-                                        <circle id="score-ring-path" class="score-ring-path" cx="50" cy="50" r="42" stroke="url(#score-gradient)" stroke-width="8" stroke-linecap="round" fill="transparent" stroke-dasharray="264" stroke-dashoffset="264"></circle>
-                                        <defs>
-                                            <linearGradient id="score-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stop-color="#FFD000" />
-                                                <stop offset="100%" stop-color="#FF6A00" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                    <div class="score-ring-text">
-                                        <span id="res-match-percentage">0%</span>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div id="res-match-grade" class="grade-pill grade-strong">Strong Match</div>
-                                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">TF-IDF Cosine Score</div>
-                                </div>
+                            <div style="background: rgba(10, 12, 18, 0.7); border: 1px solid var(--border-color); padding: 1rem 1.4rem; border-radius: 14px; text-align: center;">
+                                <div style="font-size: 0.8rem; color: var(--text-secondary);">Current ATS Match</div>
+                                <div id="builder-ats-match-score" style="font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 800; color: #FFD000;">78%</div>
+                                <div id="builder-ats-grade-badge" class="grade-pill grade-strong" style="font-size: 0.75rem; margin-top: 0.2rem;">Strong Alignment</div>
                             </div>
-                        </div>
-
-                        <!-- Recommendation Box -->
-                        <div style="background: rgba(255, 255, 255, 0.03); border-left: 4px solid #FFD000; border-radius: 8px; padding: 1rem 1.2rem;">
-                            <h5 style="font-weight: 600; color: #ffffff; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fa-solid fa-lightbulb" style="color: #FFD000;"></i> Alignment Summary
-                            </h5>
-                            <p id="res-recommendation" style="color: var(--text-secondary); font-size: 0.92rem; margin: 0; line-height: 1.5;">
-                                Analyzing document alignment...
-                            </p>
-                        </div>
-
-                        <!-- Document stats footer -->
-                        <div style="display: flex; gap: 2rem; margin-top: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem;">
-                            <div><i class="fa-solid fa-file-text"></i> Resume Word Count: <strong id="res-resume-words" style="color: #fff;">0</strong></div>
-                            <div><i class="fa-solid fa-clipboard-list"></i> JD Word Count: <strong id="res-jd-words" style="color: #fff;">0</strong></div>
                         </div>
                     </div>
 
-                    <!-- Skills Matrix (Matched vs Missing) -->
+                    <!-- Overview Grid: Required vs Mentioned Skills -->
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
-                        
-                        <!-- Matched Skills Card -->
-                        <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
-                            <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #10b981; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fa-solid fa-circle-check"></i> Matched Technical Skills
+                        <!-- Required Skills for Job Role -->
+                        <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
+                            <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fa-solid fa-briefcase" style="color: #FFD000;"></i> 1. Skills Required for This Role
                             </h4>
-                            <div id="res-matched-skills-container" class="skills-pill-grid">
-                                <span class="skill-pill matched-pill">Python</span>
+                            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">Complete technical competency list requested in the job description.</p>
+                            <div id="builder-required-skills-list" class="skills-pill-grid">
+                                <!-- Populated by JS -->
                             </div>
                         </div>
 
-                        <!-- Missing Skills Card -->
-                        <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
-                            <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #f59e0b; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fa-solid fa-triangle-exclamation"></i> Missing Job Keywords
+                        <!-- Skills Already Mentioned -->
+                        <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
+                            <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #10b981; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fa-solid fa-circle-check"></i> 2. Skills Mentioned in Candidate Resume
                             </h4>
-                            <div id="res-missing-skills-container" class="skills-pill-grid">
-                                <span class="skill-pill missing-pill">Docker</span>
+                            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">Verified skills already present in your uploaded PDF.</p>
+                            <div id="builder-resume-skills-list" class="skills-pill-grid">
+                                <!-- Populated by JS -->
                             </div>
                         </div>
                     </div>
 
-                    <!-- ATS Readiness Analysis Card -->
-                    <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
-                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                            <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fa-solid fa-file-shield" style="color: #6366f1;"></i> ATS Structure & Formatting Readiness
-                            </h4>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="font-size: 0.9rem; color: var(--text-secondary);">ATS Score:</span>
-                                <span id="res-ats-score-badge" style="font-size: 1.1rem; font-weight: 800; color: #6366f1; background: rgba(99, 102, 241, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px; border: 1px solid rgba(99, 102, 241, 0.3);">0 / 100</span>
-                            </div>
-                        </div>
-
-                        <!-- Checks Grid -->
-                        <div id="res-ats-checks-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; margin-bottom: 1.2rem;">
+                    <!-- Compulsory Skills to Add (Critical) -->
+                    <div style="background: rgba(20, 22, 30, 0.5); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 16px; padding: 1.8rem; backdrop-filter: blur(12px);">
+                        <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: #f59e0b; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-circle-exclamation"></i> 3. Compulsory Skills You MUST Add
+                        </h4>
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.2rem;">
+                            These core technical skills are explicitly requested for this role but missing in your resume. Adding them will directly cross ATS automated filter thresholds.
+                        </p>
+                        <div id="builder-compulsory-skills-container" style="display: flex; flex-direction: column; gap: 1rem;">
                             <!-- Populated by JS -->
                         </div>
-
-                        <!-- ATS Recommendations -->
-                        <div style="background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 1rem;">
-                            <h5 style="font-size: 0.88rem; font-weight: 600; color: #ffffff; margin-bottom: 0.5rem;">
-                                <i class="fa-solid fa-list-check" style="color: #FFD000;"></i> Layout & Content Optimization Tips:
-                            </h5>
-                            <ul id="res-ats-tips-list" style="margin: 0; padding-left: 1.2rem; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
-                            </ul>
-                        </div>
                     </div>
 
-                    <!-- Top Keyword Relevance Breakdown -->
-                    <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; backdrop-filter: blur(12px);">
-                        <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fa-solid fa-chart-bar" style="color: #FFD000;"></i> Key JD Term Frequency Weights
+                    <!-- Recommended Extra / Bonus Skills -->
+                    <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 16px; padding: 1.8rem; backdrop-filter: blur(12px);">
+                        <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: #6366f1; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-star" style="color: #6366f1;"></i> 4. Recommended Extra & Bonus Skills
                         </h4>
-                        <div id="res-keywords-container" style="display: flex; flex-direction: column; gap: 0.8rem;">
-                            <!-- Keyword bars populated by JS -->
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.2rem;">
+                            Highlight these industry-standard complementary tools to set your resume apart from other applicants.
+                        </p>
+                        <div id="builder-recommended-skills-container" class="skills-pill-grid">
+                            <!-- Populated by JS -->
                         </div>
                     </div>
 
-                    <!-- Report Export Action Toolbar -->
-                    <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 1rem;">
-                        <button type="button" class="action-btn" id="btn-copy-summary" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; transition: all 0.2s;">
-                            <i class="fa-solid fa-copy"></i> Copy Summary
+                    <!-- Skills to Remove (Noise Reduction) -->
+                    <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 16px; padding: 1.8rem; backdrop-filter: blur(12px);">
+                        <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: #ef4444; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-trash-arrow-up"></i> 5. Skills & Irrelevant Keywords to Remove
+                        </h4>
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.2rem;">
+                            Removing non-technical, generic, or outdated terms increases your technical keyword concentration, maximizing your TF-IDF vector score.
+                        </p>
+                        <div id="builder-remove-skills-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Custom Copyable ATS Bullet Points -->
+                    <div style="background: rgba(20, 22, 30, 0.6); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.8rem; backdrop-filter: blur(12px);">
+                        <h4 style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fa-solid fa-copy" style="color: #FFD000;"></i> 6. ATS-Optimized Project Bullet Points to Copy
+                        </h4>
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.2rem;">
+                            Copy and adapt these pre-formatted experience statements into your Work History or Projects section.
+                        </p>
+                        <div id="builder-bullet-points-container" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Builder Navigation Toolbar -->
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1rem;">
+                        <button type="button" class="action-btn" id="btn-back-to-report" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-color); color: #ffffff; padding: 0.8rem 1.6rem; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; font-weight: 600;">
+                            <i class="fa-solid fa-arrow-left"></i> Back to Screening Report
                         </button>
-                        <button type="button" class="action-btn" id="btn-print-report" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; transition: all 0.2s;">
-                            <i class="fa-solid fa-print"></i> Print / Save PDF Report
-                        </button>
-                        <button type="button" class="action-btn" id="btn-export-json" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; transition: all 0.2s;">
-                            <i class="fa-solid fa-download"></i> Export Raw JSON
+                        <button type="button" class="submit-button glow-amber" id="btn-upload-new-version" style="padding: 0.8rem 1.8rem;">
+                            <span><i class="fa-solid fa-cloud-arrow-up"></i> Upload Updated Resume</span>
                         </button>
                     </div>
                 </div>
@@ -512,53 +636,7 @@
                 </div>
 
 
-                <!-- Candidate Analysis History Section -->
-                <div style="background: rgba(20, 22, 30, 0.4); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; backdrop-filter: blur(12px);">
-                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                        <div>
-                            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 700; color: #ffffff; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fa-solid fa-history" style="color: #FFD000;"></i> Candidate Screening History
-                            </h3>
-                            <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0;">Review past resume scans, score ranks, and matched technical skills.</p>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.8rem;">
-                            <button type="button" id="btn-refresh-history" class="action-btn" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #ffffff; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
-                                <i class="fa-solid fa-rotate-right"></i> Refresh
-                            </button>
-                            <button type="button" id="btn-clear-history" class="action-btn" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;">
-                                <i class="fa-solid fa-trash"></i> Clear All
-                            </button>
-                        </div>
-                    </div>
 
-                    <!-- Search & Filter Bar -->
-                    <div style="margin-bottom: 1.2rem; display: flex; gap: 1rem;">
-                        <input type="text" id="history-search-input" placeholder="Search by filename or job title..." style="flex: 1; padding: 0.6rem 1rem; border-radius: 8px; background: rgba(10, 12, 18, 0.6); color: #ffffff; border: 1px solid var(--border-color); font-size: 0.88rem;">
-                    </div>
-
-                    <!-- History Table Container -->
-                    <div style="overflow-x: auto;">
-                        <table class="history-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
-                            <thead>
-                                <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px;">
-                                    <th style="padding: 0.8rem 1rem;">Date</th>
-                                    <th style="padding: 0.8rem 1rem;">Resume Filename</th>
-                                    <th style="padding: 0.8rem 1rem;">Job Title</th>
-                                    <th style="padding: 0.8rem 1rem;">Match Score</th>
-                                    <th style="padding: 0.8rem 1rem;">ATS Score</th>
-                                    <th style="padding: 0.8rem 1rem; text-align: right;">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="history-table-body">
-                                <!-- Table rows inserted by JS -->
-                            </tbody>
-                        </table>
-                        <div id="history-empty-state" style="display: none; padding: 2.5rem; text-align: center; color: var(--text-secondary); font-size: 0.92rem;">
-                            <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 0.8rem; display: block; opacity: 0.5;"></i>
-                            No screening history found. Upload a resume and run match analysis to get started.
-                        </div>
-                    </div>
-                </div>
 
 
                 <!-- Quick Actions & Trust Badges -->
@@ -607,7 +685,7 @@
             {% else %}
             <!-- Authentication Required Warning -->
             <div
-                style="max-width: 600px; margin: 4rem auto; text-align: center; background: rgba(17, 24, 39, 0.6); border: 1px solid var(--border-color); padding: 3rem 2rem; border-radius: 18px; backdrop-filter: blur(12px);">
+                style="max-width: 600px; margin: 1.5rem auto; text-align: center; background: rgba(17, 24, 39, 0.6); border: 1px solid var(--border-color); padding: 2.5rem 2rem; border-radius: 18px; backdrop-filter: blur(12px);">
                 <div style="font-size: 3.5rem; color: #FFD000; margin-bottom: 1.5rem;">
                     <i class="fa-solid fa-lock"></i>
                 </div>
@@ -974,8 +1052,30 @@
             </section>
         </div>
 
+    <!-- Custom Theme Confirmation Modal Overlay -->
+    <div id="custom-confirm-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 7, 18, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 99999; align-items: center; justify-content: center; padding: 1.5rem;">
+        <div style="background: rgba(15, 18, 28, 0.95); border: 1px solid rgba(255, 208, 0, 0.35); border-radius: 20px; width: 100%; max-width: 460px; padding: 2rem; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(255, 208, 0, 0.18); backdrop-filter: blur(16px); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; animation: popModal 0.3s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;">
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(255, 208, 0, 0.12); border: 1px solid rgba(255, 208, 0, 0.3); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 208, 0, 0.25);">
+                <i id="confirm-modal-icon" class="fa-solid fa-triangle-exclamation" style="font-size: 1.8rem; color: #FFD000;"></i>
+            </div>
+            <div>
+                <h3 id="confirm-modal-title" style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 700; color: #ffffff; margin-bottom: 0.4rem;">
+                    Confirm Action
+                </h3>
+                <p id="confirm-modal-message" style="font-size: 0.92rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">
+                    Are you sure you want to proceed?
+                </p>
+            </div>
+            <div style="display: flex; gap: 1rem; width: 100%; margin-top: 0.5rem;">
+                <button type="button" id="confirm-modal-btn-cancel" class="action-btn" style="flex: 1; padding: 0.8rem 1rem; border-radius: 12px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: #ffffff; font-weight: 600; cursor: pointer; font-size: 0.95rem; transition: all 0.2s ease;">
+                    Cancel
+                </button>
+                <button type="button" id="confirm-modal-btn-ok" class="submit-button glow-amber" style="flex: 1; padding: 0.8rem 1rem; border-radius: 12px; font-weight: 700; font-size: 0.95rem;">
+                    <span id="confirm-modal-btn-ok-text">Confirm</span>
+                </button>
+            </div>
+        </div>
     </div>
-
 
     <!-- Jinja config for external JS -->
     <script id="app-config-data" type="application/json">
@@ -991,7 +1091,7 @@
             window.__APP_CONFIG = { loggedIn: false, loginUrl: '/login' };
         }
     </script>
-    <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/landing.js') }}?v=20260926_v5"></script>
 
 
 
