@@ -2,6 +2,9 @@ import os
 import re
 import json
 import logging
+import secrets
+import urllib.parse
+import requests
 import sqlite3
 import mysql.connector
 import pypdf
@@ -265,6 +268,146 @@ def signup():
 def logout():
     session.clear()
     return redirect(url_for('landing'))
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Google OAuth 2.0 Configuration & Handlers
+# ──────────────────────────────────────────────────────────────────────────────
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+
+
+
+def get_google_redirect_uri():
+    """Returns the absolute callback URL for Google OAuth."""
+    explicit_uri = os.environ.get('GOOGLE_REDIRECT_URI')
+    if explicit_uri:
+        return explicit_uri
+    return url_for('google_callback', _external=True)
+
+
+@app.route('/login/google')
+def google_login():
+    """Initiates Google OAuth 2.0 authorization code flow."""
+    state = secrets.token_urlsafe(16)
+    session['oauth_state'] = state
+    
+    redirect_uri = get_google_redirect_uri()
+    
+    params = {
+        'client_id': GOOGLE_CLIENT_ID,
+        'redirect_uri': redirect_uri,
+        'response_type': 'code',
+        'scope': 'openid email profile',
+        'state': state,
+        'prompt': 'select_account'
+    }
+    
+    auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}"
+    return redirect(auth_url)
+
+
+@app.route('/login/google/callback')
+def google_callback():
+    """Handles Google OAuth 2.0 callback, exchanges code for tokens, and logs user in."""
+    error = request.args.get('error')
+    if error:
+        logger.warning(f"Google OAuth authorization error: {error}")
+        return render_template('auth.html', action='login', error=f"Google authentication failed: {error}")
+        
+    code = request.args.get('code')
+    state = request.args.get('state')
+    
+    # CSRF State Verification
+    stored_state = session.pop('oauth_state', None)
+    if not state or state != stored_state:
+        logger.warning("Google OAuth state mismatch detected.")
+        return render_template('auth.html', action='login', error="Security error: Invalid state token. Please try again.")
+
+    if not code:
+        return render_template('auth.html', action='login', error="Authorization code missing from Google response.")
+
+    redirect_uri = get_google_redirect_uri()
+
+    # Exchange Authorization Code for Tokens
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        'code': code,
+        'client_id': GOOGLE_CLIENT_ID,
+        'client_secret': GOOGLE_CLIENT_SECRET,
+        'redirect_uri': redirect_uri,
+        'grant_type': 'authorization_code'
+    }
+
+    try:
+        token_resp = requests.post(token_url, data=token_data, timeout=10)
+        token_json = token_resp.json()
+
+        if 'error' in token_json:
+            err_msg = token_json.get('error_description', token_json['error'])
+            logger.error(f"Google token exchange failed: {err_msg}")
+            return render_template('auth.html', action='login', error=f"Google Token Exchange Error: {err_msg}")
+
+        access_token = token_json.get('access_token')
+        if not access_token:
+            return render_template('auth.html', action='login', error="Failed to acquire access token from Google.")
+
+        # Retrieve User Profile Data from Google
+        user_info_resp = requests.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={'Authorization': f'Bearer {access_token}'},
+            timeout=10
+        )
+        user_info = user_info_resp.json()
+
+        email = user_info.get('email', '')
+        name = user_info.get('name', '') or user_info.get('given_name', '')
+        
+        if not email:
+            return render_template('auth.html', action='login', error="Could not retrieve email from Google profile.")
+
+        # Determine target username (name or email prefix)
+        base_username = email.split('@')[0] if email else name.replace(' ', '_')
+        if not base_username:
+            base_username = f"google_user_{user_info.get('id', '1234')[:6]}"
+
+        # Search for existing user by username
+        existing_user = db_query("SELECT * FROM users WHERE username = %s", (base_username,), fetchone=True)
+        
+        if not existing_user:
+            alt_user = db_query("SELECT * FROM users WHERE username = %s", (email,), fetchone=True)
+            if alt_user:
+                username_to_use = email
+            else:
+                username_to_use = base_username
+                dummy_hash = generate_password_hash(secrets.token_urlsafe(16))
+                try:
+                    db_query(
+                        "INSERT INTO users (username, password_hash) VALUES (%s, %s)",
+                        (username_to_use, dummy_hash),
+                        commit=True
+                    )
+                except Exception:
+                    username_to_use = email
+                    db_query(
+                        "INSERT INTO users (username, password_hash) VALUES (%s, %s)",
+                        (username_to_use, dummy_hash),
+                        commit=True
+                    )
+        else:
+            username_to_use = base_username
+
+        # Set User Session
+        session['username'] = username_to_use
+        session['user_email'] = email
+        session['user_avatar'] = user_info.get('picture', '')
+        logger.info(f"User '{username_to_use}' authenticated successfully via Google OAuth.")
+
+        return redirect(url_for('landing', _anchor='dashboard'))
+
+    except Exception as e:
+        logger.error(f"Google OAuth Exception: {e}", exc_info=True)
+        return render_template('auth.html', action='login', error=f"Google authentication system error: {e}")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
