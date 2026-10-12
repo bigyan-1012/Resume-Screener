@@ -94,13 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Splash Screen ──────────────────────────────────────────
     const splash = document.getElementById('splash-screen');
 
-    // Hide splash screen after 2.4 seconds
-    setTimeout(() => {
-        if (splash) {
-            splash.classList.add('splash-fade-out');
-        }
-
-        // Initialize scroll reveal animations for features after splash hides
+    const initScrollReveal = () => {
         const observerOptions = {
             threshold: 0.15,
             rootMargin: "0px 0px -50px 0px"
@@ -118,7 +112,31 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.reveal-on-scroll').forEach(el => {
             revealObserver.observe(el);
         });
-    }, 2400);
+    };
+
+    const navEntries = (window.performance && typeof window.performance.getEntriesByType === 'function')
+        ? window.performance.getEntriesByType('navigation')
+        : [];
+    const isReload = (navEntries.length > 0 && navEntries[0].type === 'reload') ||
+                     (window.performance && window.performance.navigation && window.performance.navigation.type === 1);
+    const hasShownSplash = sessionStorage.getItem('hirehive_splash_shown');
+    const shouldShowSplash = !hasShownSplash || isReload;
+
+    if (shouldShowSplash) {
+        sessionStorage.setItem('hirehive_splash_shown', 'true');
+        // Hide splash screen after 2.4 seconds
+        setTimeout(() => {
+            if (splash) {
+                splash.classList.add('splash-fade-out');
+            }
+            initScrollReveal();
+        }, 2400);
+    } else {
+        if (splash) {
+            splash.style.display = 'none';
+        }
+        initScrollReveal();
+    }
 
     // ── Initialize from URL parameter or hash on load ──────────
     const urlParams = new URLSearchParams(window.location.search);

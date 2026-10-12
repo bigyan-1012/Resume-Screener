@@ -13,12 +13,37 @@
         rel="stylesheet">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='logo.jpg') }}">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=20260926_v5">
 </head>
 
 <body class="landing-page">
-    <!-- Floating Background Assets -->
+    <!-- Splash Screen Intro -->
+    <div id="splash-screen" class="splash-screen">
+        <script>
+            (function() {
+                var navEntries = (window.performance && typeof window.performance.getEntriesByType === 'function')
+                    ? window.performance.getEntriesByType('navigation') : [];
+                var isReload = (navEntries.length > 0 && navEntries[0].type === 'reload') ||
+                               (window.performance && window.performance.navigation && window.performance.navigation.type === 1);
+                var hasShown = sessionStorage.getItem('hirehive_splash_shown');
+                if (hasShown && !isReload) {
+                    document.getElementById('splash-screen').style.display = 'none';
+                }
+            })();
+        </script>
+        <div class="splash-logo-container">
+            <div class="logo-container splash-logo-row">
+                <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Hire𝒽ive Logo"
+                    class="brand-logo-img splash-icon">
+                <h1 class="logo-text splash-logo-text">
+                    Hire<span class="logo-accent">𝒽</span>ive
+                </h1>
+            </div>
+        </div>
+    </div>
 
     <!-- Floating Background Assets -->
     <div class="bg-gradient-background"></div>

@@ -16,6 +16,10 @@ from flask import (
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from engine import (
+    KnowledgeBaseRetriever, ResumeParser, TaxonomyMatcher,
+    MatchingScorer, EvidenceRecommender
+)
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Logging configuration
@@ -26,6 +30,13 @@ logging.basicConfig(
     datefmt="%H:%M:%S"
 )
 logger = logging.getLogger("app")
+
+# Initialize Phase 3B Occupational Knowledge Base Matching Engine
+kb_retriever = KnowledgeBaseRetriever()
+resume_parser = ResumeParser()
+taxonomy_matcher = TaxonomyMatcher(retriever=kb_retriever)
+matching_scorer = MatchingScorer()
+evidence_recommender = EvidenceRecommender()
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Flask Application
@@ -623,8 +634,8 @@ def check_ats_formatting(resume_text):
     }
 
 
-def analyze_resume_against_jd(resume_text, jd_text):
-    """Compute Cosine Similarity match percentage, ATS readiness, and extract matched vs missing skills."""
+def analyze_resume_against_jd(resume_text, jd_text, job_title="General Match"):
+    """Compute JobFitScore match percentage using Phase 3B engine, ATS readiness, and extract matched vs missing skills."""
     clean_resume = clean_text(resume_text)
     clean_jd = clean_text(jd_text)
 
@@ -637,73 +648,58 @@ def analyze_resume_against_jd(resume_text, jd_text):
             "top_keywords": [],
             "recommendation": "Could not extract text from resume or job description.",
             "ats_analysis": check_ats_formatting(resume_text),
-            "ats_score": 0
+            "ats_score": 0,
+            "resume_word_count": len(clean_resume.split()) if clean_resume else 0,
+            "jd_word_count": len(clean_jd.split()) if clean_jd else 0,
         }
 
-    # Calculate TF-IDF Cosine Similarity
-    vectorizer = TfidfVectorizer(stop_words='english', ngram_range=(1, 2))
-    try:
-        tfidf_matrix = vectorizer.fit_transform([clean_jd, clean_resume])
-        feature_names = vectorizer.get_feature_names_out()
-        similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
-        match_percentage = round(float(similarity) * 100, 1)
-    except Exception as e:
-        logger.error(f"TF-IDF calculation failed: {e}")
-        match_percentage = 0.0
-        feature_names = []
-        tfidf_matrix = None
+    # 1. Parse document structure & negation
+    parsed = resume_parser.parse(resume_text)
 
-    # Categorize match quality
-    if match_percentage >= 75:
-        grade = "Strong Match"
-        recommendation = "Excellent candidate alignment! Resume strongly reflects key requirements and technical keywords of the job description."
-    elif match_percentage >= 50:
-        grade = "Moderate Match"
-        recommendation = "Good baseline alignment. Candidate possesses several core skills, but could benefit from highlighting missing job requirements."
-    elif match_percentage >= 25:
-        grade = "Low Match"
-        recommendation = "Fair match. Several key skills and qualifications from the job description appear missing or unemphasized."
-    else:
-        grade = "Weak Match"
-        recommendation = "Low keyword alignment. Significant skill gaps detected relative to the target job description."
+    # 2. Extract candidate skills using taxonomy matcher
+    cand_skills = taxonomy_matcher.extract_skills(
+        parsed["clean_text"], negated_terms=parsed["negated_terms"]
+    )
 
-    # Extract skill overlap
-    resume_skills = set(extract_skills_from_text(clean_resume))
-    jd_skills = set(extract_skills_from_text(clean_jd))
+    # 3. Extract target job requirements (ESCO / O*NET taxonomy)
+    target_reqs = taxonomy_matcher.extract_target_requirements(job_title, jd_text)
 
-    matched_skills = sorted(list(resume_skills.intersection(jd_skills)))
-    missing_skills = sorted(list(jd_skills.difference(resume_skills)))
+    # 4. Score job fit using calibrated multi-dimensional feature model
+    score_res = matching_scorer.compute_score(
+        resume_text=parsed["clean_text"],
+        jd_text=clean_jd,
+        candidate_skills=cand_skills,
+        essential_skills=target_reqs["essential_skills"],
+        optional_skills=target_reqs["optional_skills"],
+        job_title=job_title,
+        retrieved_requirements=target_reqs,
+    )
 
-    # Identify key JD terms and whether they exist in resume
-    top_keywords = []
-    if tfidf_matrix is not None and len(feature_names) > 0:
-        jd_vector = tfidf_matrix[0].toarray()[0]
-        top_indices = jd_vector.argsort()[::-1][:10]
-        for idx in top_indices:
-            word = feature_names[idx]
-            score = round(float(jd_vector[idx]), 3)
-            if score > 0:
-                in_resume = word in clean_resume
-                top_keywords.append({
-                    "word": word.title(),
-                    "score": score,
-                    "in_resume": in_resume
-                })
+    # 5. Generate evidence-based recommendations
+    rec_res = evidence_recommender.generate_recommendations(
+        candidate_skills=cand_skills,
+        essential_skills=target_reqs["essential_skills"],
+        optional_skills=target_reqs["optional_skills"],
+        experience_bullets=parsed["experience_bullets"],
+        negated_terms=parsed["negated_terms"],
+    )
 
-    # Evaluate ATS formatting
+    # 6. Evaluate ATS formatting
     ats_info = check_ats_formatting(resume_text)
 
     return {
-        "match_percentage": match_percentage,
-        "grade": grade,
-        "matched_skills": matched_skills,
-        "missing_skills": missing_skills,
-        "top_keywords": top_keywords,
-        "recommendation": recommendation,
+        "match_percentage": score_res["match_percentage"],
+        "grade": score_res["grade"],
+        "matched_skills": rec_res["matched_skills"],
+        "missing_skills": rec_res["missing_skills"],
+        "top_keywords": score_res["top_keywords"],
+        "recommendation": score_res["recommendation"],
         "ats_analysis": ats_info,
         "ats_score": ats_info["ats_score"],
         "resume_word_count": len(clean_resume.split()),
-        "jd_word_count": len(clean_jd.split())
+        "jd_word_count": len(clean_jd.split()),
+        "context_gaps": rec_res["context_gaps"],
+        "feature_vector": score_res["feature_vector"],
     }
 
 
@@ -748,7 +744,7 @@ def analyze():
             logger.warning(f"Could not extract text from PDF: {sec_fname}")
             continue
 
-        res = analyze_resume_against_jd(resume_text, jd_text)
+        res = analyze_resume_against_jd(resume_text, jd_text, job_title=job_title)
         res['filename'] = sec_fname
         res['job_title'] = job_title
 
@@ -774,8 +770,8 @@ def analyze():
     if not results:
         return jsonify({"success": False, "error": "Unable to extract readable text from uploaded resume PDF(s)."}), 400
 
-    # Rank candidates from HIGH to LOW based on ATS Score (and secondary sort by match percentage)
-    results.sort(key=lambda x: (x.get('ats_score', 0), x.get('match_percentage', 0)), reverse=True)
+    # Rank candidates from HIGH to LOW based on JobFit match percentage (and secondary sort by ATS score)
+    results.sort(key=lambda x: (x.get('match_percentage', 0), x.get('ats_score', 0)), reverse=True)
     for idx, cand in enumerate(results, start=1):
         cand['rank'] = idx
 

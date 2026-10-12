@@ -364,7 +364,6 @@ textarea:focus + .textarea-glow {
 
 .upload-dropzone:hover .dropzone-icon {
     color: var(--accent-blue);
-    transform: translateY(-3px);
 }
 
 .upload-dropzone h3 {
@@ -494,8 +493,6 @@ textarea:focus + .textarea-glow {
 }
 
 .submit-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(0, 157, 255, 0.4);
     opacity: 0.95;
 }
 
@@ -1794,7 +1791,7 @@ textarea:focus + .textarea-glow {
     background: rgba(255, 208, 0, 0.22) !important;
     border-color: rgba(255, 208, 0, 0.6) !important;
     box-shadow: 0 0 20px rgba(255, 208, 0, 0.2) !important;
-    transform: translateY(-2px);
+    transform: scale(1.02);
 }
 
 .landing-hero-split {
@@ -2245,7 +2242,20 @@ textarea:focus + .textarea-glow {
 
 /* Hover Border Strike for Buttons */
 .submit-button, .cta-btn, .navbar-login-btn, .home-btn-link, .logout-btn-link {
+    position: relative;
     transition: transform var(--transition-medium), border-color var(--transition-medium), box-shadow var(--transition-medium);
+}
+
+/* Hit Area Extender to eliminate hover transform feedback loop jitter */
+.submit-button::after, .cta-btn::after, .navbar-login-btn::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    bottom: -8px;
+    left: -4px;
+    right: -4px;
+    pointer-events: auto;
+    z-index: 0;
 }
 
 .submit-button:hover, .cta-btn:hover, .navbar-login-btn:hover {
@@ -3187,6 +3197,7 @@ body.non-home-active .bg-gradient-background {
    ────────────────────────────────────────────────────────────────────────────── */
 
 .jd-preset-btn {
+    position: relative;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 208, 0, 0.2);
     color: var(--text-primary);
@@ -3196,6 +3207,16 @@ body.non-home-active .bg-gradient-background {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+}
+
+.jd-preset-btn::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    left: 0;
+    right: 0;
+    pointer-events: auto;
 }
 
 .jd-preset-btn:hover {
@@ -3324,9 +3345,25 @@ body.non-home-active .bg-gradient-background {
 }
 
 /* Action Button Styles & Hover */
+.action-btn {
+    position: relative;
+    transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.action-btn::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    left: 0;
+    right: 0;
+    pointer-events: auto;
+}
+
 .action-btn:hover {
     background: rgba(255, 208, 0, 0.15) !important;
     border-color: rgba(255, 208, 0, 0.4) !important;
+    box-shadow: 0 0 12px rgba(255, 208, 0, 0.2) !important;
     transform: translateY(-2px);
 }
 
