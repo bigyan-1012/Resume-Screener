@@ -3108,6 +3108,129 @@ textarea:focus + .textarea-glow {
     color: #FFD000;
 }
 
+/* Contact Alert Banner */
+.contact-alert-banner {
+    padding: 0.85rem 1.1rem;
+    border-radius: 10px;
+    margin-bottom: 1.2rem;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    animation: fadeIn 0.3s ease;
+}
+
+.contact-alert-banner.error {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+}
+
+.contact-alert-banner.success {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #6ee7b7;
+}
+
+/* Ticket Success Card */
+.ticket-success-card {
+    text-align: center;
+    padding: 1rem 0;
+    animation: fadeIn 0.4s ease;
+}
+
+.ticket-success-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1.2rem auto;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.15);
+    border: 2px solid rgba(16, 185, 129, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #10B981;
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+}
+
+.ticket-success-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    font-family: 'Outfit', sans-serif;
+}
+
+.ticket-success-desc {
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.ticket-reference-box {
+    background: rgba(15, 18, 28, 0.85);
+    border: 1px solid rgba(255, 208, 0, 0.35);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.ticket-ref-label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #FFD000;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.ticket-ref-id-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.ticket-ref-code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.ticket-copy-btn {
+    background: rgba(255, 208, 0, 0.15);
+    border: 1px solid rgba(255, 208, 0, 0.3);
+    color: #FFD000;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.ticket-copy-btn:hover {
+    background: #FFD000;
+    color: #0b0d14;
+    transform: scale(1.05);
+}
+
+.ticket-info-note {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.4;
+    padding: 0.5rem;
+}
+
 /* Footer Section styling */
 .app-footer {
     margin-top: 5rem;

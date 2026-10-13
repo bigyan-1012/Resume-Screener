@@ -20,6 +20,12 @@ An intelligent, full-stack AI Resume Screener and Applicant Tracking System (ATS
 - **Secure Authentication & Google OAuth 2.0**:
   - Native authentication with Werkzeug password hashing.
   - Integrated **Google OAuth 2.0 Sign In / Sign Up** with CSRF state token validation.
+- **Automated Contact Us & Customer Support System**:
+  - Unique Ticket ID generator (`HH-TK-XXXXXXXX`) and dual-database ticket storage.
+  - Email notification engine supporting **Resend API** and **SMTP** with graceful offline/demo fallback.
+  - Automated customer acknowledgment emails with ticket tracking reference.
+  - Honeypot spam trap and sliding-window IP/email rate limiting.
+  - Glassmorphic ticket confirmation UI with one-click reference code copying.
 - **Screening History Dashboard**: Track, view, delete, or clear past resume analysis reports.
 - **Premium Glassmorphic UI**: Responsive dark theme UI with HSL gradients, CSS glassmorphism, animated SVG score gauges, modal candidate inspectors, and dynamic tab management.
 

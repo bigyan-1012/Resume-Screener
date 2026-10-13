@@ -1,6 +1,10 @@
 import os
 import re
 import json
+import time
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import logging
 import secrets
 import urllib.parse
@@ -8,6 +12,7 @@ import requests
 import sqlite3
 import mysql.connector
 import pypdf
+from dotenv import load_dotenv
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from flask import (
@@ -20,6 +25,9 @@ from engine import (
     KnowledgeBaseRetriever, ResumeParser, TaxonomyMatcher,
     MatchingScorer, EvidenceRecommender
 )
+
+# Load environment variables from .env
+load_dotenv()
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Logging configuration
@@ -43,7 +51,7 @@ evidence_recommender = EvidenceRecommender()
 # ──────────────────────────────────────────────────────────────────────────────
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload size
-app.secret_key = os.environ.get('SECRET_KEY', 'screener-matching-secure-key-9a8f')
+app.secret_key = os.environ.get('SECRET_KEY', 'hirehive-screener-matching-secure-key-9a8f')
 
 # Upload folder configuration
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
@@ -52,14 +60,29 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 ALLOWED_EXTENSIONS = {'pdf'}
 
 # ──────────────────────────────────────────────────────────────────────────────
+# Customer Support & Email Configuration
+# ──────────────────────────────────────────────────────────────────────────────
+SUPPORT_EMAIL = os.environ.get('SUPPORT_EMAIL', 'support@hirehive.ai').strip()
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '').strip()
+RESEND_FROM_EMAIL = os.environ.get('RESEND_FROM_EMAIL', 'HireHive Support <support@hirehive.ai>').strip()
+
+# Optional SMTP Settings (alternative to Resend)
+MAIL_SERVER = os.environ.get('MAIL_SERVER', '').strip()
+MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
+MAIL_USERNAME = os.environ.get('MAIL_USERNAME', '').strip()
+MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', '').strip()
+MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ('true', '1', 'yes')
+MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', SUPPORT_EMAIL).strip()
+
+# ──────────────────────────────────────────────────────────────────────────────
 # Database Configuration & Dual-Mode Engine (MySQL + SQLite Fallback)
 # ──────────────────────────────────────────────────────────────────────────────
 DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'Nabeen@1427',
+    'host': os.environ.get('DB_HOST', 'localhost'),
+    'user': os.environ.get('DB_USER', 'root'),
+    'password': os.environ.get('DB_PASSWORD', ''),
 }
-DB_NAME = 'resume_screener'
+DB_NAME = os.environ.get('DB_NAME', 'resume_screener')
 SQLITE_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resume_screener.db')
 USE_MYSQL = False
 
@@ -100,6 +123,21 @@ def init_db():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS support_tickets (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                ticket_id VARCHAR(50) UNIQUE NOT NULL,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(150) NOT NULL,
+                subject VARCHAR(200) NOT NULL,
+                message TEXT NOT NULL,
+                status VARCHAR(50) DEFAULT 'open',
+                email_status VARCHAR(50) DEFAULT 'pending',
+                error_message TEXT,
+                ip_address VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        ''')
         conn.commit()
         cursor.close()
         conn.close()
@@ -128,6 +166,21 @@ def init_db():
                 matched_skills TEXT,
                 missing_skills TEXT,
                 ats_score INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS support_tickets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ticket_id TEXT UNIQUE NOT NULL,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL,
+                subject TEXT NOT NULL,
+                message TEXT NOT NULL,
+                status TEXT DEFAULT 'open',
+                email_status TEXT DEFAULT 'pending',
+                error_message TEXT,
+                ip_address TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
@@ -437,6 +490,13 @@ def dashboard():
     if 'username' not in session:
         return redirect(url_for('login'))
     return redirect(url_for('landing', _anchor='dashboard'))
+
+
+@app.route('/contact')
+def contact_page():
+    logged_in = 'username' in session
+    username = session.get('username', '')
+    return render_template('landing.html', logged_in=logged_in, username=username, active_tab='contact')
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -869,6 +929,320 @@ def clear_history():
     except Exception as e:
         logger.error(f"Error clearing history: {e}")
         return jsonify({"success": False, "error": "Failed to clear history."}), 500
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Automated Customer Support & Contact Us Automation
+# ──────────────────────────────────────────────────────────────────────────────
+
+contact_rate_limit_store = {}
+
+
+def is_contact_rate_limited(identifier: str, max_requests: int = 5, window_seconds: int = 600) -> bool:
+    """Sliding-window in-memory rate limiter for contact form submissions."""
+    now = time.time()
+    history = contact_rate_limit_store.get(identifier, [])
+    history = [t for t in history if now - t < window_seconds]
+    if len(history) >= max_requests:
+        contact_rate_limit_store[identifier] = history
+        return True
+    history.append(now)
+    contact_rate_limit_store[identifier] = history
+    return False
+
+
+def generate_ticket_id() -> str:
+    """Generates a unique HireHive Support Ticket Reference (e.g., HH-TK-7C38A1D2)."""
+    return f"HH-TK-{secrets.token_hex(4).upper()}"
+
+
+def build_support_notification_html(ticket_id: str, name: str, email: str, subject: str, message: str) -> str:
+    """Generates professional HTML email sent to support@hirehive.ai."""
+    safe_name = name.replace('<', '&lt;').replace('>', '&gt;')
+    safe_email = email.replace('<', '&lt;').replace('>', '&gt;')
+    safe_subject = subject.replace('<', '&lt;').replace('>', '&gt;')
+    safe_msg = message.replace('<', '&lt;').replace('>', '&gt;').replace('\n', '<br>')
+
+    return f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0f121d; color: #e5e7eb; padding: 24px;">
+    <div style="max-width: 600px; margin: 0 auto; background: #1a1e2e; border: 1px solid #374151; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        <div style="border-bottom: 2px solid #FFD000; padding-bottom: 12px; margin-bottom: 20px;">
+            <h2 style="color: #FFD000; margin: 0; font-size: 20px;">📬 New HireHive Support Ticket</h2>
+            <p style="color: #9ca3af; margin: 4px 0 0 0; font-size: 13px;">Reference ID: <strong style="color: #ffffff;">{ticket_id}</strong></p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
+            <tr>
+                <td style="padding: 8px 0; color: #9ca3af; width: 120px;">Customer:</td>
+                <td style="padding: 8px 0; color: #ffffff; font-weight: 600;">{safe_name}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; color: #9ca3af;">Email:</td>
+                <td style="padding: 8px 0;"><a href="mailto:{safe_email}" style="color: #FFD000; text-decoration: none;">{safe_email}</a></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; color: #9ca3af;">Subject:</td>
+                <td style="padding: 8px 0; color: #ffffff;">{safe_subject}</td>
+            </tr>
+        </table>
+        <div style="background: #111422; border-left: 4px solid #FFD000; padding: 16px; border-radius: 6px; margin-bottom: 20px;">
+            <div style="font-size: 12px; text-transform: uppercase; color: #9ca3af; margin-bottom: 8px; font-weight: 700;">Customer Message</div>
+            <div style="line-height: 1.6; color: #f3f4f6; font-size: 14px;">{safe_msg}</div>
+        </div>
+        <div style="font-size: 12px; color: #6b7280; text-align: center; border-top: 1px solid #374151; padding-top: 16px;">
+            Automated notification generated by HireHive Support Engine.
+        </div>
+    </div>
+</body>
+</html>"""
+
+
+def build_customer_ack_html(ticket_id: str, name: str, subject: str) -> str:
+    """Generates customer acknowledgment email confirming ticket creation."""
+    safe_name = name.replace('<', '&lt;').replace('>', '&gt;')
+    safe_subject = subject.replace('<', '&lt;').replace('>', '&gt;')
+
+    return f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0b0d14; color: #e5e7eb; padding: 24px;">
+    <div style="max-width: 600px; margin: 0 auto; background: #141724; border: 1px solid rgba(255, 208, 0, 0.25); border-radius: 14px; padding: 28px; box-shadow: 0 12px 30px rgba(0,0,0,0.6);">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div style="display: inline-block; background: rgba(255, 208, 0, 0.15); border: 1px solid #FFD000; border-radius: 50%; width: 50px; height: 50px; line-height: 50px; font-size: 24px;">🐝</div>
+            <h2 style="color: #ffffff; margin: 12px 0 4px 0; font-size: 22px;">We've Received Your Request</h2>
+            <p style="color: #9ca3af; margin: 0; font-size: 14px;">HireHive Customer Support & ATS Advisory</p>
+        </div>
+        <p style="color: #e5e7eb; font-size: 15px; line-height: 1.6;">Hi <strong>{safe_name}</strong>,</p>
+        <p style="color: #d1d5db; font-size: 14px; line-height: 1.6;">
+            Thank you for reaching out to HireHive! Your inquiry regarding <em>"{safe_subject}"</em> has been received and logged in our system.
+        </p>
+        <div style="background: rgba(255, 208, 0, 0.08); border: 1px solid rgba(255, 208, 0, 0.3); border-radius: 8px; padding: 16px; margin: 20px 0; text-align: center;">
+            <span style="display: block; font-size: 12px; text-transform: uppercase; color: #FFD000; font-weight: 700; letter-spacing: 1px;">Your Support Reference ID</span>
+            <span style="display: block; font-size: 22px; font-weight: 800; color: #ffffff; margin-top: 4px; font-family: monospace;">{ticket_id}</span>
+        </div>
+        <p style="color: #9ca3af; font-size: 13px; line-height: 1.6;">
+            Our support engineers and product specialists review tickets during business hours and typically respond within <strong>24 hours</strong>. If you have any additional information to add, simply reply to this email or cite your Ticket ID.
+        </p>
+        <hr style="border: none; border-top: 1px solid #2a2f42; margin: 24px 0;" />
+        <div style="font-size: 12px; color: #6b7280; line-height: 1.5;">
+            Best regards,<br>
+            <strong style="color: #ffffff;">The HireHive Team</strong><br>
+            <a href="mailto:{SUPPORT_EMAIL}" style="color: #FFD000; text-decoration: none;">{SUPPORT_EMAIL}</a>
+        </div>
+    </div>
+</body>
+</html>"""
+
+
+def send_contact_emails(ticket_id: str, name: str, email: str, subject: str, message: str):
+    """
+    Dispatches:
+      1. Notification to support@hirehive.ai
+      2. Acknowledgment to customer
+    Supports Resend API, SMTP, or graceful Demo Mode fallback.
+    Returns: (email_status: str, error_message: str | None)
+    """
+    notify_html = build_support_notification_html(ticket_id, name, email, subject, message)
+    ack_html = build_customer_ack_html(ticket_id, name, subject)
+
+    # 1. Resend API Integration
+    if RESEND_API_KEY:
+        try:
+            headers = {
+                "Authorization": f"Bearer {RESEND_API_KEY}",
+                "Content-Type": "application/json"
+            }
+            res_notify = requests.post(
+                "https://api.resend.com/emails",
+                headers=headers,
+                json={
+                    "from": RESEND_FROM_EMAIL or "onboarding@resend.dev",
+                    "to": [SUPPORT_EMAIL],
+                    "subject": f"[HireHive Support] Ticket {ticket_id}: {subject}",
+                    "html": notify_html,
+                    "reply_to": email
+                },
+                timeout=8
+            )
+            res_ack = requests.post(
+                "https://api.resend.com/emails",
+                headers=headers,
+                json={
+                    "from": RESEND_FROM_EMAIL or "onboarding@resend.dev",
+                    "to": [email],
+                    "subject": f"[HireHive Support] We received your request ({ticket_id})",
+                    "html": ack_html
+                },
+                timeout=8
+            )
+            if res_notify.status_code in (200, 201) and res_ack.status_code in (200, 201):
+                logger.info(f"Emails successfully dispatched via Resend for ticket {ticket_id}.")
+                return ("sent", None)
+            else:
+                err_text = f"Resend response codes: notify={res_notify.status_code}, ack={res_ack.status_code}."
+                logger.warning(f"Resend dispatch warning for ticket {ticket_id}: {err_text}")
+                return ("sent_with_warnings", err_text)
+        except Exception as e:
+            logger.error(f"Failed to dispatch email via Resend for ticket {ticket_id}: {e}")
+            return ("failed", str(e))
+
+    # 2. SMTP Integration
+    elif MAIL_SERVER and MAIL_USERNAME:
+        try:
+            server = smtplib.SMTP(MAIL_SERVER, MAIL_PORT, timeout=12)
+            server.ehlo()
+            if MAIL_USE_TLS:
+                server.starttls()
+                server.ehlo()
+            if MAIL_PASSWORD:
+                server.login(MAIL_USERNAME, MAIL_PASSWORD)
+
+            # Send Notification to Support
+            msg_notify = MIMEMultipart('alternative')
+            msg_notify['Subject'] = f"[HireHive Support] Ticket {ticket_id}: {subject}"
+            msg_notify['From'] = MAIL_DEFAULT_SENDER
+            msg_notify['To'] = SUPPORT_EMAIL
+            msg_notify['Reply-To'] = email
+            msg_notify.attach(MIMEText(notify_html, 'html'))
+            server.sendmail(MAIL_DEFAULT_SENDER, [SUPPORT_EMAIL], msg_notify.as_string())
+
+            # Send Acknowledgment to Customer
+            msg_ack = MIMEMultipart('alternative')
+            msg_ack['Subject'] = f"[HireHive Support] We received your request ({ticket_id})"
+            msg_ack['From'] = MAIL_DEFAULT_SENDER
+            msg_ack['To'] = email
+            msg_ack.attach(MIMEText(ack_html, 'html'))
+            server.sendmail(MAIL_DEFAULT_SENDER, [email], msg_ack.as_string())
+
+            server.quit()
+            logger.info(f"Emails successfully dispatched via SMTP for ticket {ticket_id}.")
+            return ("sent", None)
+        except Exception as e:
+            logger.error(f"Failed to dispatch email via SMTP for ticket {ticket_id}: {e}")
+            return ("failed", str(e))
+
+    # 3. Demo Mode (Local / Unconfigured Mail)
+    else:
+        logger.info(
+            f"[DEMO MODE] Support ticket {ticket_id} registered. "
+            f"Sender: {name} <{email}>. Subject: '{subject}'. "
+            f"Message: '{message[:60]}...'. Notification logged to server console."
+        )
+        return ("demo_mode", None)
+
+
+@app.route('/api/contact', methods=['POST'])
+def submit_contact():
+    """Submit a customer support request, validate, generate ticket ID, save to DB, and send notifications."""
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
+
+    # Honeypot spam trap
+    honeypot = data.get('hp_field', '').strip() or data.get('hp_website', '').strip()
+    if honeypot:
+        logger.warning(f"Contact submission blocked by honeypot from IP: {request.remote_addr}")
+        return jsonify({
+            "success": True,
+            "ticket_id": generate_ticket_id(),
+            "message": "Thank you! Your support ticket has been received.",
+            "email_status": "demo_mode"
+        }), 200
+
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip()
+    subject = data.get('subject', '').strip() or 'General Support Inquiry'
+    message = data.get('message', '').strip()
+
+    # Validations
+    if not name or len(name) < 2 or len(name) > 100:
+        return jsonify({"success": False, "error": "Please provide your name (2 to 100 characters)."}), 400
+
+    email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    if not email or not re.match(email_regex, email) or len(email) > 150:
+        return jsonify({"success": False, "error": "Please provide a valid email address."}), 400
+
+    if not subject or len(subject) < 3 or len(subject) > 200:
+        return jsonify({"success": False, "error": "Subject must be between 3 and 200 characters."}), 400
+
+    if not message or len(message) < 10 or len(message) > 5000:
+        return jsonify({"success": False, "error": "Message must be between 10 and 5000 characters."}), 400
+
+    # Rate limiting
+    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr or '127.0.0.1')
+    if is_contact_rate_limited(f"ip:{client_ip}") or is_contact_rate_limited(f"email:{email.lower()}"):
+        return jsonify({
+            "success": False,
+            "error": "You have submitted too many requests recently. Please wait a few minutes before trying again."
+        }), 429
+
+    ticket_id = generate_ticket_id()
+    email_status, error_msg = send_contact_emails(ticket_id, name, email, subject, message)
+
+    try:
+        db_query(
+            """INSERT INTO support_tickets 
+               (ticket_id, name, email, subject, message, status, email_status, error_message, ip_address) 
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+            (ticket_id, name, email, subject, message, 'open', email_status, error_msg, client_ip),
+            commit=True
+        )
+        logger.info(f"Support ticket {ticket_id} created for {email} ({name}). Email status: {email_status}")
+    except Exception as e:
+        logger.error(f"Error saving support ticket to database: {e}")
+        return jsonify({"success": False, "error": "Failed to store ticket in database."}), 500
+
+    return jsonify({
+        "success": True,
+        "ticket_id": ticket_id,
+        "message": f"Thank you, {name}! Your ticket ({ticket_id}) has been registered. Our support team will follow up shortly.",
+        "email_status": email_status
+    }), 201
+
+
+@app.route('/api/contact/status/<ticket_id>', methods=['GET'])
+def get_ticket_status(ticket_id):
+    """Check the status of a specific ticket by reference ID."""
+    clean_id = ticket_id.strip()
+    try:
+        ticket = db_query(
+            "SELECT ticket_id, name, subject, status, email_status, created_at FROM support_tickets WHERE ticket_id = %s",
+            (clean_id,),
+            fetchone=True
+        )
+        if not ticket:
+            return jsonify({"success": False, "error": "Ticket not found."}), 404
+
+        return jsonify({
+            "success": True,
+            "ticket": {
+                "ticket_id": ticket['ticket_id'],
+                "name": ticket['name'],
+                "subject": ticket['subject'],
+                "status": ticket['status'],
+                "email_status": ticket.get('email_status', 'pending'),
+                "created_at": str(ticket['created_at'])
+            }
+        })
+    except Exception as e:
+        logger.error(f"Error fetching ticket status: {e}")
+        return jsonify({"success": False, "error": "Failed to look up ticket."}), 500
+
+
+@app.route('/api/contact/tickets', methods=['GET'])
+def list_support_tickets():
+    """Retrieve recent support tickets for logged-in administration review."""
+    if 'username' not in session:
+        return jsonify({"success": False, "error": "Unauthorized."}), 401
+
+    try:
+        tickets = db_query(
+            "SELECT id, ticket_id, name, email, subject, status, email_status, created_at FROM support_tickets ORDER BY id DESC LIMIT 50",
+            fetchall=True
+        )
+        return jsonify({"success": True, "tickets": tickets or []})
+    except Exception as e:
+        logger.error(f"Error loading support tickets: {e}")
+        return jsonify({"success": False, "error": "Failed to retrieve support tickets."}), 500
 
 
 # ──────────────────────────────────────────────────────────────────────────────

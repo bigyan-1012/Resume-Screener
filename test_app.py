@@ -5,7 +5,8 @@ from unittest.mock import patch
 import pypdf
 from app import (
     app, clean_text, extract_skills_from_text,
-    analyze_resume_against_jd, check_ats_formatting
+    analyze_resume_against_jd, check_ats_formatting,
+    db_query, contact_rate_limit_store
 )
 
 
@@ -158,6 +159,130 @@ class TestResumeScreener(unittest.TestCase):
         finally:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
+
+
+    def test_contact_page_route(self):
+        resp = self.client.get('/contact')
+        self.assertEqual(resp.status_code, 200)
+
+    def test_contact_submission_success(self):
+        contact_rate_limit_store.clear()
+        payload = {
+            'name': 'Alex Morgan',
+            'email': 'alex.morgan@example.com',
+            'subject': 'Resume Analysis Support',
+            'message': 'Hello, I have a question about how ATS keyword weighting is calculated.'
+        }
+        resp = self.client.post('/api/contact', json=payload)
+        self.assertEqual(resp.status_code, 201)
+        data = resp.get_json()
+        self.assertTrue(data['success'])
+        self.assertIn('ticket_id', data)
+        self.assertTrue(data['ticket_id'].startswith('HH-TK-'))
+        ticket_id = data['ticket_id']
+
+        # Verify database record
+        with app.app_context():
+            ticket = db_query("SELECT * FROM support_tickets WHERE ticket_id = %s", (ticket_id,), fetchone=True)
+            self.assertIsNotNone(ticket)
+            self.assertEqual(ticket['name'], 'Alex Morgan')
+            self.assertEqual(ticket['email'], 'alex.morgan@example.com')
+            self.assertEqual(ticket['status'], 'open')
+
+    def test_contact_validation_missing_name(self):
+        payload = {
+            'name': '',
+            'email': 'valid@example.com',
+            'subject': 'General Inquiry',
+            'message': 'This is a test inquiry message with sufficient length.'
+        }
+        resp = self.client.post('/api/contact', json=payload)
+        self.assertEqual(resp.status_code, 400)
+        data = resp.get_json()
+        self.assertFalse(data['success'])
+        self.assertIn('name', data['error'].lower())
+
+    def test_contact_validation_invalid_email(self):
+        payload = {
+            'name': 'Valid User',
+            'email': 'invalid-email-address',
+            'subject': 'General Inquiry',
+            'message': 'This is a test inquiry message with sufficient length.'
+        }
+        resp = self.client.post('/api/contact', json=payload)
+        self.assertEqual(resp.status_code, 400)
+        data = resp.get_json()
+        self.assertFalse(data['success'])
+        self.assertIn('email', data['error'].lower())
+
+    def test_contact_validation_short_message(self):
+        payload = {
+            'name': 'Valid User',
+            'email': 'valid@example.com',
+            'subject': 'General Inquiry',
+            'message': 'Too short'
+        }
+        resp = self.client.post('/api/contact', json=payload)
+        self.assertEqual(resp.status_code, 400)
+        data = resp.get_json()
+        self.assertFalse(data['success'])
+        self.assertIn('message', data['error'].lower())
+
+    def test_contact_honeypot_spam_trap(self):
+        payload = {
+            'name': 'Spam Bot',
+            'email': 'spambot@example.com',
+            'subject': 'Spam subject',
+            'message': 'Spam message that should be ignored by the system.',
+            'hp_website': 'http://buy-viagra-now.com'
+        }
+        resp = self.client.post('/api/contact', json=payload)
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertTrue(data['success'])
+
+        # Verify spambot was NOT saved to support_tickets
+        with app.app_context():
+            ticket = db_query("SELECT * FROM support_tickets WHERE email = %s", ('spambot@example.com',), fetchone=True)
+            self.assertIsNone(ticket)
+
+    def test_contact_ticket_status_lookup(self):
+        contact_rate_limit_store.clear()
+        payload = {
+            'name': 'Status Check User',
+            'email': 'status.check@example.com',
+            'subject': 'Status Inquiry',
+            'message': 'Checking that status lookup endpoint functions properly.'
+        }
+        resp = self.client.post('/api/contact', json=payload)
+        self.assertEqual(resp.status_code, 201)
+        ticket_id = resp.get_json()['ticket_id']
+
+        status_resp = self.client.get(f'/api/contact/status/{ticket_id}')
+        self.assertEqual(status_resp.status_code, 200)
+        status_data = status_resp.get_json()
+        self.assertTrue(status_data['success'])
+        self.assertEqual(status_data['ticket']['ticket_id'], ticket_id)
+        self.assertEqual(status_data['ticket']['status'], 'open')
+
+    def test_contact_rate_limiting(self):
+        contact_rate_limit_store.clear()
+        payload = {
+            'name': 'Rate Limit Tester',
+            'email': 'ratelimit@example.com',
+            'subject': 'Rate Limit Test',
+            'message': 'Testing sliding window rate limit on contact form endpoint.'
+        }
+        # First 5 should succeed (201)
+        for _ in range(5):
+            resp = self.client.post('/api/contact', json=payload)
+            self.assertEqual(resp.status_code, 201)
+
+        # 6th should be rate-limited (429)
+        rate_resp = self.client.post('/api/contact', json=payload)
+        self.assertEqual(rate_resp.status_code, 429)
+        self.assertIn('too many requests', rate_resp.get_json()['error'].lower())
+        contact_rate_limit_store.clear()
 
 
 if __name__ == '__main__':

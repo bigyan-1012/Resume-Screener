@@ -138,11 +138,13 @@ document.addEventListener('DOMContentLoaded', () => {
         initScrollReveal();
     }
 
-    // ── Initialize from URL parameter or hash on load ──────────
+    // ── Initialize from URL parameter, pathname, or hash on load ──────────
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
     const hashParam = window.location.hash.substring(1);
-    const initialTab = tabParam || hashParam || 'home';
+    const configTab = window.__APP_CONFIG && window.__APP_CONFIG.activeTab;
+    const isContactRoute = window.location.pathname.startsWith('/contact');
+    const initialTab = (isContactRoute ? 'contact' : null) || (configTab && configTab !== 'home' ? configTab : null) || tabParam || hashParam || 'home';
 
     // Switch to the correct tab on startup (no delay since splash is running)
     if (initialTab !== 'home') {
@@ -1345,6 +1347,158 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial history fetch if user is on Dashboard
     loadHistory();
+
+    // ── Automated Contact Us & Support Automation ──────────
+    const contactForm = document.getElementById('hirehive-contact-form');
+    const contactAlert = document.getElementById('contact-alert');
+    const contactSuccessCard = document.getElementById('contact-success-card');
+    const contactSubmitBtn = document.getElementById('contact-submit-btn');
+    const contactBtnContent = document.getElementById('contact-btn-content');
+    const contactTopicSelect = document.getElementById('contact-topic-select');
+    const contactSubjectInput = document.getElementById('contact-subject');
+    const ticketRefIdVal = document.getElementById('ticket-ref-id-val');
+    const ticketAckNote = document.getElementById('ticket-ack-note');
+    const copyTicketIdBtn = document.getElementById('copy-ticket-id-btn');
+    const contactResetBtn = document.getElementById('contact-reset-btn');
+
+    if (contactTopicSelect && contactSubjectInput) {
+        contactTopicSelect.addEventListener('change', () => {
+            if (contactTopicSelect.value === 'Other') {
+                contactSubjectInput.value = '';
+                contactSubjectInput.placeholder = 'Please enter a custom subject...';
+                contactSubjectInput.focus();
+            } else {
+                contactSubjectInput.value = contactTopicSelect.value;
+            }
+        });
+    }
+
+    if (contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Clear previous alert
+            if (contactAlert) {
+                contactAlert.style.display = 'none';
+                contactAlert.className = 'contact-alert-banner';
+                contactAlert.textContent = '';
+            }
+
+            const name = (document.getElementById('contact-name')?.value || '').trim();
+            const email = (document.getElementById('contact-email')?.value || '').trim();
+            const subject = (contactSubjectInput?.value || '').trim();
+            const message = (document.getElementById('contact-message')?.value || '').trim();
+            const hp_website = (document.getElementById('contact-hp')?.value || '').trim();
+
+            if (!name || name.length < 2) {
+                showContactAlert('Please provide your name (at least 2 characters).', 'error');
+                return;
+            }
+            if (!email || !email.includes('@')) {
+                showContactAlert('Please enter a valid email address.', 'error');
+                return;
+            }
+            if (!subject || subject.length < 3) {
+                showContactAlert('Please provide a subject line (at least 3 characters).', 'error');
+                return;
+            }
+            if (!message || message.length < 10) {
+                showContactAlert('Please provide a message with at least 10 characters.', 'error');
+                return;
+            }
+
+            // Set loading state
+            if (contactSubmitBtn && contactBtnContent) {
+                contactSubmitBtn.disabled = true;
+                contactBtnContent.innerHTML = 'Sending Ticket... <i class="fa-solid fa-spinner fa-spin" style="margin-left: 6px;"></i>';
+            }
+
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        subject: subject,
+                        message: message,
+                        hp_website: hp_website
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    contactForm.style.display = 'none';
+                    if (ticketRefIdVal) {
+                        ticketRefIdVal.textContent = data.ticket_id || 'HH-TK-SUCCESS';
+                    }
+                    if (ticketAckNote) {
+                        if (data.email_status === 'sent') {
+                            ticketAckNote.textContent = `A confirmation acknowledgment was delivered to ${email}.`;
+                        } else {
+                            ticketAckNote.textContent = `Your ticket is logged. Our team at support@hirehive.ai will reach out to ${email}.`;
+                        }
+                    }
+                    if (contactSuccessCard) {
+                        contactSuccessCard.style.display = 'block';
+                    }
+                } else {
+                    showContactAlert(data.error || 'Failed to submit contact request. Please try again.', 'error');
+                }
+            } catch (err) {
+                console.error('Contact submission error:', err);
+                showContactAlert('Network error while submitting support ticket. Please check your connection and try again.', 'error');
+            } finally {
+                if (contactSubmitBtn && contactBtnContent) {
+                    contactSubmitBtn.disabled = false;
+                    contactBtnContent.innerHTML = 'Send Message <i class="fa-solid fa-paper-plane" style="margin-left: 6px;"></i>';
+                }
+            }
+        });
+    }
+
+    function showContactAlert(msg, type) {
+        if (!contactAlert) return;
+        contactAlert.textContent = msg;
+        contactAlert.className = `contact-alert-banner ${type}`;
+        contactAlert.style.display = 'block';
+    }
+
+    if (copyTicketIdBtn && ticketRefIdVal) {
+        copyTicketIdBtn.addEventListener('click', () => {
+            const ticketId = ticketRefIdVal.textContent.trim();
+            navigator.clipboard.writeText(ticketId).then(() => {
+                copyTicketIdBtn.innerHTML = '<i class="fa-solid fa-check" style="color: #10B981;"></i>';
+                setTimeout(() => {
+                    copyTicketIdBtn.innerHTML = '<i class="fa-solid fa-copy"></i>';
+                }, 2000);
+            }).catch(() => {
+                alert('Ticket ID: ' + ticketId);
+            });
+        });
+    }
+
+    if (contactResetBtn) {
+        contactResetBtn.addEventListener('click', () => {
+            if (contactForm) {
+                contactForm.reset();
+                contactForm.style.display = 'block';
+            }
+            if (contactSubjectInput && contactTopicSelect) {
+                contactTopicSelect.value = 'General Inquiry';
+                contactSubjectInput.value = 'General Inquiry';
+            }
+            if (contactSuccessCard) {
+                contactSuccessCard.style.display = 'none';
+            }
+            if (contactAlert) {
+                contactAlert.style.display = 'none';
+            }
+        });
+    }
 
 });
 

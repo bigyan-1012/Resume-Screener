@@ -984,27 +984,86 @@
                 </div>
 
                 <div class="contact-grid">
-                    <div class="contact-form-card">
+                    <div class="contact-form-card" id="contact-form-card-container">
                         <h3>Send us a Message</h3>
-                        <form onsubmit="event.preventDefault(); alert('Message sent successfully! (Demo Mode)');">
-                            <div class="form-group">
-                                <label for="contact-name">Name</label>
-                                <input type="text" id="contact-name" class="form-input" required placeholder="John Doe">
+                        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: -0.8rem; margin-bottom: 1.5rem;">
+                            Need help with resume analysis, recruiter batch features, or account questions? Submit a ticket below.
+                        </p>
+
+                        <!-- Error / Validation Alert Banner -->
+                        <div id="contact-alert" class="contact-alert-banner" style="display: none;"></div>
+
+                        <!-- Contact Form -->
+                        <form id="hirehive-contact-form" autocomplete="off">
+                            <!-- Honeypot protection against spam bots -->
+                            <div style="display: none !important;">
+                                <label for="contact-hp">Website</label>
+                                <input type="text" id="contact-hp" name="hp_website" tabindex="-1" autocomplete="off">
                             </div>
+
+                            <div class="form-group">
+                                <label for="contact-name">Your Full Name</label>
+                                <input type="text" id="contact-name" class="form-input" required placeholder="e.g. Alex Morgan" minlength="2" maxlength="100">
+                            </div>
+
                             <div class="form-group">
                                 <label for="contact-email">Email Address</label>
-                                <input type="email" id="contact-email" class="form-input" required
-                                    placeholder="john@example.com">
+                                <input type="email" id="contact-email" class="form-input" required placeholder="e.g. alex.morgan@example.com" maxlength="150">
                             </div>
+
                             <div class="form-group">
-                                <label for="contact-message">Message</label>
-                                <textarea id="contact-message" class="form-input" rows="5" required
-                                    placeholder="Your message here..."></textarea>
+                                <label for="contact-topic-select">Inquiry Topic & Subject</label>
+                                <select id="contact-topic-select" class="form-input" style="cursor: pointer; margin-bottom: 0.5rem; background: rgba(20, 24, 36, 0.9);">
+                                    <option value="General Inquiry">General Inquiry</option>
+                                    <option value="Resume Parsing Issue">Resume Parsing / PDF Extraction Issue</option>
+                                    <option value="ATS Match Scoring Question">ATS Match Scoring & Recommendations</option>
+                                    <option value="Recruiter Multi-Upload">Recruiter Mode & Batch Screening</option>
+                                    <option value="Account & Authentication">Account, Login & Google OAuth</option>
+                                    <option value="Enterprise & API Access">Enterprise Partnership & API Access</option>
+                                    <option value="Other">Other (Custom Subject)</option>
+                                </select>
+                                <input type="text" id="contact-subject" class="form-input" required placeholder="Brief subject line..." value="General Inquiry" minlength="3" maxlength="200">
                             </div>
-                            <button type="submit" class="submit-button glow-amber">
-                                <span>Send Message <i class="fa-solid fa-paper-plane"></i></span>
+
+                            <div class="form-group">
+                                <label for="contact-message">Message Details</label>
+                                <textarea id="contact-message" class="form-input" rows="5" required placeholder="Please describe your question or issue in detail..." minlength="10" maxlength="5000"></textarea>
+                            </div>
+
+                            <button type="submit" id="contact-submit-btn" class="submit-button glow-amber" style="width: 100%;">
+                                <span id="contact-btn-content">Send Message <i class="fa-solid fa-paper-plane" style="margin-left: 6px;"></i></span>
                             </button>
                         </form>
+
+                        <!-- Success Result Card with Ticket ID -->
+                        <div id="contact-success-card" class="ticket-success-card" style="display: none;">
+                            <div class="ticket-success-icon">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <h4 class="ticket-success-title">Support Ticket Created!</h4>
+                            <p class="ticket-success-desc">
+                                We've received your inquiry and our support engineering team has been notified.
+                            </p>
+
+                            <div class="ticket-reference-box">
+                                <span class="ticket-ref-label">Your Ticket Reference ID</span>
+                                <div class="ticket-ref-id-row">
+                                    <span id="ticket-ref-id-val" class="ticket-ref-code">HH-TK-XXXXXXXX</span>
+                                    <button type="button" id="copy-ticket-id-btn" class="ticket-copy-btn" title="Copy to clipboard">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="ticket-info-note">
+                                <i class="fa-solid fa-envelope-circle-check" style="color: #FFD000; margin-right: 6px;"></i>
+                                <span id="ticket-ack-note">An automated acknowledgment has been sent to your email.</span>
+                            </div>
+
+                            <button type="button" id="contact-reset-btn" class="action-btn" style="width: 100%; margin-top: 1.2rem; padding: 0.8rem; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: #ffffff; cursor: pointer; font-weight: 600;">
+                                <i class="fa-solid fa-plus" style="margin-right: 6px;"></i> Submit Another Inquiry
+                            </button>
+                        </div>
                     </div>
 
                     <div class="contact-info-card">
@@ -1014,17 +1073,7 @@
                             </div>
                             <div class="info-text">
                                 <h4>Email Support</h4>
-                                <p><a href="mailto:support@hirehive.ai">support@hirehive.ai</a></p>
-                            </div>
-                        </div>
-
-                        <div class="info-item">
-                            <div class="info-icon">
-                                <i class="fa-solid fa-phone"></i>
-                            </div>
-                            <div class="info-text">
-                                <h4>Phone Line</h4>
-                                <p>+1 (555) 304-4321</p>
+                                <p><a href="mailto:hirehive.support@gmail.com">hirehive.support@gmail.com</a></p>
                             </div>
                         </div>
 
@@ -1056,7 +1105,7 @@
                             </div>
                             <div class="info-text">
                                 <h4>Office Location</h4>
-                                <p>San Francisco, CA, USA</p>
+                                <p>GIET University Gunupur</p>
                             </div>
                         </div>
                     </div>
@@ -1071,7 +1120,7 @@
                         <a href="https://github.com/hirehive-ai" target="_blank"><i class="fa-brands fa-github"></i></a>
                         <a href="https://linkedin.com/company/hirehive-ai" target="_blank"><i
                                 class="fa-brands fa-linkedin"></i></a>
-                        <a href="mailto:support@hirehive.ai"><i class="fa-solid fa-envelope"></i></a>
+                        <a href="mailto:hirehive.support@gmail.com"><i class="fa-solid fa-envelope"></i></a>
                     </div>
                 </footer>
             </section>
@@ -1106,7 +1155,8 @@
     <script id="app-config-data" type="application/json">
         {
             "loggedIn": {{ logged_in|tojson }},
-            "loginUrl": {{ url_for('login')|tojson }}
+            "loginUrl": {{ url_for('login')|tojson }},
+            "activeTab": {{ active_tab|default('home')|tojson }}
         }
     </script>
     <script>
