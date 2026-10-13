@@ -529,6 +529,7 @@ def google_callback():
 # ──────────────────────────────────────────────────────────────────────────────
 
 @app.route('/')
+@app.route('/api/index')
 def landing():
     logged_in = 'username' in session
     username = session.get('username', '')
@@ -543,6 +544,7 @@ def dashboard():
 
 
 @app.route('/contact')
+@app.route('/api/index/contact')
 def contact_page():
     logged_in = 'username' in session
     username = session.get('username', '')
