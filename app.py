@@ -63,7 +63,8 @@ else:
 app = Flask(
     __name__,
     template_folder=os.path.join(BASE_DIR, 'templates'),
-    static_folder=os.path.join(BASE_DIR, 'static')
+    static_folder=os.path.join(BASE_DIR, 'static'),
+    static_url_path='/static'
 )
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload size
 app.secret_key = os.environ.get('SECRET_KEY', 'hirehive-screener-matching-secure-key-9a8f')
