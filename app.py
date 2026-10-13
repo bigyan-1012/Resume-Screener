@@ -46,16 +46,38 @@ taxonomy_matcher = TaxonomyMatcher(retriever=kb_retriever)
 matching_scorer = MatchingScorer()
 evidence_recommender = EvidenceRecommender()
 
+# Base & Runtime Environment Detection
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+IS_VERCEL = bool(os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'))
+
+# On Vercel / serverless microVMs, the app root is read-only.
+# Only /tmp is writable for ephemeral storage and SQLite.
+if IS_VERCEL or not os.access(BASE_DIR, os.W_OK):
+    WRITABLE_DIR = '/tmp'
+else:
+    WRITABLE_DIR = BASE_DIR
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Flask Application
 # ──────────────────────────────────────────────────────────────────────────────
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, 'templates'),
+    static_folder=os.path.join(BASE_DIR, 'static')
+)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload size
 app.secret_key = os.environ.get('SECRET_KEY', 'hirehive-screener-matching-secure-key-9a8f')
 
 # Upload folder configuration
-UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+UPLOAD_FOLDER = os.path.join(WRITABLE_DIR, 'uploads')
+try:
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+except Exception:
+    UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')
+    try:
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    except Exception:
+        pass
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 ALLOWED_EXTENSIONS = {'pdf'}
 
@@ -81,112 +103,136 @@ DB_CONFIG = {
     'host': os.environ.get('DB_HOST', 'localhost'),
     'user': os.environ.get('DB_USER', 'root'),
     'password': os.environ.get('DB_PASSWORD', ''),
+    'connection_timeout': 2,
 }
 DB_NAME = os.environ.get('DB_NAME', 'resume_screener')
-SQLITE_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resume_screener.db')
+SQLITE_DB_PATH = os.path.join(WRITABLE_DIR, 'resume_screener.db')
 USE_MYSQL = False
 
 
 def init_db():
     """Initialize database tables using MySQL if available, or SQLite fallback."""
-    global USE_MYSQL
-    try:
-        conn = mysql.connector.connect(**DB_CONFIG)
-        cursor = conn.cursor()
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
-        conn.commit()
-        cursor.close()
-        conn.close()
+    global USE_MYSQL, SQLITE_DB_PATH
 
-        db_conn_config = DB_CONFIG.copy()
-        db_conn_config['database'] = DB_NAME
-        conn = mysql.connector.connect(**db_conn_config)
-        cursor = conn.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(100) UNIQUE NOT NULL,
-                password_hash VARCHAR(255) NOT NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-        ''')
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS analyses (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(100) NOT NULL,
-                filename VARCHAR(255) NOT NULL,
-                job_title VARCHAR(255),
-                match_score FLOAT NOT NULL,
-                grade VARCHAR(50),
-                matched_skills TEXT,
-                missing_skills TEXT,
-                ats_score INT DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-        ''')
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS support_tickets (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                ticket_id VARCHAR(50) UNIQUE NOT NULL,
-                name VARCHAR(100) NOT NULL,
-                email VARCHAR(150) NOT NULL,
-                subject VARCHAR(200) NOT NULL,
-                message TEXT NOT NULL,
-                status VARCHAR(50) DEFAULT 'open',
-                email_status VARCHAR(50) DEFAULT 'pending',
-                error_message TEXT,
-                ip_address VARCHAR(50),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-        ''')
-        conn.commit()
-        cursor.close()
-        conn.close()
-        USE_MYSQL = True
-        logger.info("MySQL database and tables initialized successfully.")
-    except Exception as e:
-        logger.warning(f"MySQL connection failed ({e}). Initializing SQLite fallback.")
+    # On Vercel / Serverless, localhost MySQL does not exist. Fail fast to avoid Lambda timeouts.
+    skip_mysql = IS_VERCEL and DB_CONFIG.get('host') in ('localhost', '127.0.0.1', '', None)
+
+    if not skip_mysql:
+        try:
+            db_conn_cfg = DB_CONFIG.copy()
+            db_conn_cfg['connection_timeout'] = 2
+            conn = mysql.connector.connect(**db_conn_cfg)
+            cursor = conn.cursor()
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            db_conn_config = db_conn_cfg.copy()
+            db_conn_config['database'] = DB_NAME
+            conn = mysql.connector.connect(**db_conn_config)
+            cursor = conn.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    username VARCHAR(100) UNIQUE NOT NULL,
+                    password_hash VARCHAR(255) NOT NULL
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS analyses (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    username VARCHAR(100) NOT NULL,
+                    filename VARCHAR(255) NOT NULL,
+                    job_title VARCHAR(255),
+                    match_score FLOAT NOT NULL,
+                    grade VARCHAR(50),
+                    matched_skills TEXT,
+                    missing_skills TEXT,
+                    ats_score INT DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS support_tickets (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    ticket_id VARCHAR(50) UNIQUE NOT NULL,
+                    name VARCHAR(100) NOT NULL,
+                    email VARCHAR(150) NOT NULL,
+                    subject VARCHAR(200) NOT NULL,
+                    message TEXT NOT NULL,
+                    status VARCHAR(50) DEFAULT 'open',
+                    email_status VARCHAR(50) DEFAULT 'pending',
+                    error_message TEXT,
+                    ip_address VARCHAR(50),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+            ''')
+            conn.commit()
+            cursor.close()
+            conn.close()
+            USE_MYSQL = True
+            logger.info("MySQL database and tables initialized successfully.")
+            return
+        except Exception as e:
+            logger.warning(f"MySQL connection skipped or failed ({e}). Initializing SQLite fallback.")
+            USE_MYSQL = False
+    else:
         USE_MYSQL = False
-        conn = sqlite3.connect(SQLITE_DB_PATH)
-        cursor = conn.cursor()
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL
-            )
-        ''')
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS analyses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL,
-                filename TEXT NOT NULL,
-                job_title TEXT,
-                match_score REAL NOT NULL,
-                grade TEXT,
-                matched_skills TEXT,
-                missing_skills TEXT,
-                ats_score INTEGER DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS support_tickets (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                ticket_id TEXT UNIQUE NOT NULL,
-                name TEXT NOT NULL,
-                email TEXT NOT NULL,
-                subject TEXT NOT NULL,
-                message TEXT NOT NULL,
-                status TEXT DEFAULT 'open',
-                email_status TEXT DEFAULT 'pending',
-                error_message TEXT,
-                ip_address TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        conn.commit()
-        conn.close()
-        logger.info(f"SQLite fallback database initialized at {SQLITE_DB_PATH}.")
+
+    # Resilient SQLite fallback across writable candidate locations
+    candidate_db_paths = [
+        SQLITE_DB_PATH,
+        os.path.join('/tmp', 'resume_screener.db'),
+        ':memory:'
+    ]
+    for db_path in candidate_db_paths:
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL
+                )
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS analyses (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT NOT NULL,
+                    filename TEXT NOT NULL,
+                    job_title TEXT,
+                    match_score REAL NOT NULL,
+                    grade TEXT,
+                    matched_skills TEXT,
+                    missing_skills TEXT,
+                    ats_score INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS support_tickets (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ticket_id TEXT UNIQUE NOT NULL,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    subject TEXT NOT NULL,
+                    message TEXT NOT NULL,
+                    status TEXT DEFAULT 'open',
+                    email_status TEXT DEFAULT 'pending',
+                    error_message TEXT,
+                    ip_address TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            conn.commit()
+            conn.close()
+            SQLITE_DB_PATH = db_path
+            logger.info(f"SQLite database initialized successfully at {SQLITE_DB_PATH}.")
+            break
+        except Exception as sqle:
+            logger.warning(f"Failed to initialize SQLite at {db_path}: {sqle}")
 
 
 # Run DB initialization at module load
@@ -200,9 +246,13 @@ def get_db():
         if USE_MYSQL:
             db_conn_config = DB_CONFIG.copy()
             db_conn_config['database'] = DB_NAME
+            db_conn_config['connection_timeout'] = 2
             db = g._database = mysql.connector.connect(**db_conn_config)
         else:
-            db = g._database = sqlite3.connect(SQLITE_DB_PATH)
+            try:
+                db = g._database = sqlite3.connect(SQLITE_DB_PATH)
+            except Exception:
+                db = g._database = sqlite3.connect('/tmp/resume_screener.db')
             db.row_factory = sqlite3.Row
     return db
 
